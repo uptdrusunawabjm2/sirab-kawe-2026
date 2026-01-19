@@ -1,189 +1,56 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 <title>Dashboard Internal Rusun</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-slate-950 text-white">
 
-<body class="bg-gradient-to-br from-black via-slate-900 to-black text-white min-h-screen">
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-4">Dashboard Internal</h1>
 
-<div class="flex">
-
-<!-- SIDEBAR -->
-<aside class="w-64 bg-slate-900/80 min-h-screen p-5">
-  <h1 class="text-xl font-bold mb-8">🏠 RUSUN DASHBOARD</h1>
-  <div class="text-gray-400">Manajemen Penghuni</div>
-  <button onclick="logout()" class="mt-6 text-red-400">Logout</button>
-</aside>
-
-<!-- MAIN -->
-<main class="flex-1 p-8">
-
-<h2 class="text-2xl font-bold mb-6">Dashboard Internal</h2>
-
-<!-- CARDS -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-  <div class="card"><div>Penghuni</div><b id="cPenghuni" class="text-2xl">0</b></div>
-  <div class="card"><div>Unit Terisi</div><b id="cTerisi" class="text-2xl">0</b></div>
-  <div class="card"><div>Total Bayar</div><b id="cBayar" class="text-2xl">Rp 0</b></div>
-  <div class="card"><div>Total Tunggakan</div><b id="cTunggakan" class="text-2xl">Rp 0</b></div>
-</div>
-
-<!-- TABLE -->
-<div class="bg-slate-900/70 rounded-xl p-5">
-  <h3 class="font-bold mb-3">Daftar Penghuni</h3>
-
-  <input id="search" placeholder="Cari unit / nama / no telp..." 
-    class="w-full mb-4 p-2 rounded bg-slate-800 outline-none"/>
-
-  <div class="overflow-auto max-h-[65vh]">
-    <table class="w-full text-sm">
-      <thead id="thead"></thead>
-      <tbody id="tbody"></tbody>
-    </table>
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-slate-800 p-4 rounded">Penghuni<br><b id="tp">0</b></div>
+    <div class="bg-slate-800 p-4 rounded">Unit Terisi<br><b id="ut">0</b></div>
+    <div class="bg-slate-800 p-4 rounded">Total Bayar<br><b id="tb">Rp 0</b></div>
+    <div class="bg-slate-800 p-4 rounded">Total Tunggakan<br><b id="tt">Rp 0</b></div>
   </div>
-</div>
 
-</main>
-</div>
-
-<!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center">
-  <div class="bg-slate-900 w-full max-w-3xl rounded-xl p-6 relative">
-    <button onclick="closeModal()" class="absolute top-3 right-4 text-xl">✖</button>
-    <h3 id="mdTitle" class="text-xl font-bold mb-3"></h3>
-    <div id="mdBody"></div>
-  </div>
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-slate-700">
+        <th>Unit</th><th>Nama</th><th>No Telp</th><th>Status</th><th>Total Bayar</th><th>Total Tunggakan</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
 
 <script>
-const API = "/api/data?action=internal&key=rusun2026";
-
-const tbody = document.getElementById("tbody");
-const thead = document.getElementById("thead");
-const search = document.getElementById("search");
-
-const cPenghuni = document.getElementById("cPenghuni");
-const cTerisi = document.getElementById("cTerisi");
-const cBayar = document.getElementById("cBayar");
-const cTunggakan = document.getElementById("cTunggakan");
-
-const modal = document.getElementById("modal");
-const mdTitle = document.getElementById("mdTitle");
-const mdBody = document.getElementById("mdBody");
-
-let penghuni = [];
-
-function rupiah(n){
-  return "Rp " + Number(n||0).toLocaleString("id-ID");
-}
-
-async function load(){
-  const r = await fetch(API);
-  const j = await r.json();
+fetch("/api/data?action=internal&key=rusun2026")
+.then(r=>r.json())
+.then(j=>{
   const d = j.data;
 
-  cPenghuni.innerText = d.totalPenghuni;
-  cTerisi.innerText   = d.unitTerisi;
-  cBayar.innerText    = rupiah(d.totalPembayaran);
-  cTunggakan.innerText = rupiah(d.totalTunggakan);
+  tp.innerText = d.totalPenghuni;
+  ut.innerText = d.unitTerisi;
+  tb.innerText = "Rp " + d.totalPembayaran.toLocaleString("id-ID");
+  tt.innerText = "Rp " + d.totalTunggakan.toLocaleString("id-ID");
 
-  penghuni = d.listPenghuni;
-  render(penghuni);
-}
-
-function render(data){
-  thead.innerHTML = `
-  <tr class="border-b border-slate-700 text-left">
-    <th class="p-2">Unit</th>
-    <th>Nama</th>
-    <th>No Telp</th>
-    <th>Status</th>
-    <th>Total Bayar</th>
-    <th>Total Tunggakan</th>
-  </tr>`;
-
-  let h="";
-  data.forEach(r=>{
-    h+=`
-    <tr onclick="detail('${r.unit}')" 
-      class="border-b border-slate-800 hover:bg-slate-800 cursor-pointer">
-      <td class="p-2">${r.unit}</td>
-      <td>${r.penghuni.nama||""}</td>
-      <td>${r.penghuni.notelp||""}</td>
-      <td>${r.penghuni.kondisiunit||""}</td>
-      <td>${rupiah(r.pembayaran)}</td>
-      <td>${rupiah(r.tunggakan)}</td>
+  let html="";
+  d.listPenghuni.forEach(p=>{
+    html+=`<tr class="border-b border-slate-800">
+      <td>${p.unit.toUpperCase()}</td>
+      <td>${p.nama}</td>
+      <td>${p.notelp}</td>
+      <td>${p.status}</td>
+      <td>Rp ${p.pembayaran.toLocaleString("id-ID")}</td>
+      <td>Rp ${p.tunggakan.toLocaleString("id-ID")}</td>
     </tr>`;
   });
-
-  tbody.innerHTML = h;
-}
-
-search.addEventListener("input",e=>{
-  const q=e.target.value.toLowerCase();
-  render(penghuni.filter(r=>
-    r.unit.toLowerCase().includes(q) ||
-    (r.penghuni.nama||"").toLowerCase().includes(q) ||
-    String(r.penghuni.notelp||"").toLowerCase().includes(q)
-  ));
+  tbody.innerHTML = html;
 });
-
-function detail(unit){
-  const x = penghuni.find(p=>p.unit===unit);
-  if(!x) return;
-
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-
-  mdTitle.innerText = "Unit " + x.unit;
-
-  mdBody.innerHTML = `
-  <div class="grid grid-cols-2 gap-4 mb-4">
-    <div><b>Nama</b><br>${x.penghuni.nama||"-"}</div>
-    <div><b>No Telp</b><br>${x.penghuni.notelp||"-"}</div>
-    <div><b>Status</b><br>${x.penghuni.kondisiunit||"-"}</div>
-    <div><b>Total Bayar</b><br>${rupiah(x.pembayaran)}</div>
-    <div><b>Total Tunggakan</b><br>${rupiah(x.tunggakan)}</div>
-  </div>
-
-  <hr class="my-3 border-slate-700">
-
-  <b>Riwayat Pembayaran</b>
-  <pre class="text-xs bg-black p-3 rounded mt-2 overflow-auto max-h-40">
-${JSON.stringify(x.bayarList,null,2)}
-  </pre>
-
-  <hr class="my-3 border-slate-700">
-
-  <b>Data Tunggakan</b>
-  <pre class="text-xs bg-black p-3 rounded mt-2 overflow-auto max-h-40">
-${JSON.stringify(x.tunggakanData,null,2)}
-  </pre>
-  `;
-}
-
-function closeModal(){
-  modal.classList.add("hidden");
-}
-
-function logout(){
-  localStorage.removeItem("login");
-  location.href="/";
-}
-
-load();
 </script>
-
-<style>
-.card{
-  background:linear-gradient(135deg,#0f172a,#020617);
-  border-radius:1rem;
-  padding:1.2rem;
-}
-</style>
-
 </body>
 </html>
