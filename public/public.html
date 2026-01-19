@@ -15,13 +15,13 @@
 </h1>
 
 <!-- DASHBOARD UTAMA -->
-<div id="cards" class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-10"></div>
+<div id="cards" class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-12"></div>
 
 <!-- DASHBOARD PER RUSUN -->
-<h2 class="text-xl font-bold mb-4 mt-6">🏘️ Dashboard per Rusun</h2>
+<h2 class="text-xl font-bold mb-4">Dashboard Rusunawa</h2>
 <div id="perRusun" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
-<p id="lastUpdate" class="text-gray-400 text-sm mt-8"></p>
+<p id="lastUpdate" class="text-gray-400 text-sm mt-10"></p>
 
 </div>
 
@@ -31,60 +31,34 @@ async function load(){
   const j = await r.json();
   const d = j.data;
 
-  const persenHunian = d.totalUnit > 0 
-    ? ((d.unitTerisi / d.totalUnit) * 100).toFixed(1) 
-    : 0;
+  /* =====================
+     GLOBAL
+  ===================== */
+  const g = d.global;
+  const persenGlobal = g.total ? ((g.terisi / g.total) * 100).toFixed(1) : 0;
 
-  // ===== CARD UTAMA =====
   cards.innerHTML = `
-    ${card("Total Unit", d.totalUnit, "from-slate-700 to-slate-800")}
-    ${card("Siap Huni", d.unitSiapHuni, "from-green-600 to-green-700")}
-    ${card("Terisi", d.unitTerisi, "from-blue-600 to-blue-700")}
-    ${card("Rusak", d.unitRusak, "from-red-600 to-red-700")}
-    ${card("Hunian", persenHunian + " %", "from-purple-600 to-purple-700")}
+    ${card("Total Unit", g.total, "from-slate-700 to-slate-800")}
+    ${card("Siap Huni", g.siap, "from-green-600 to-green-700")}
+    ${card("Terisi", g.terisi, "from-blue-600 to-blue-700")}
+    ${card("Rusak", g.rusak, "from-red-600 to-red-700")}
+    ${card("Hunian", persenGlobal + " %", "from-purple-600 to-purple-700")}
   `;
 
-  // ===== OLAH DATA PER RUSUN =====
-  const rusunData = {
-    "Ganda Maghfirah": { total:0, terisi:0, siap:0, rusak:0 },
-    "Teluk Kelayan": { total:0, terisi:0, siap:0, rusak:0 }
-  };
-
-  Object.keys(d.struktur).forEach(rusun=>{
-    Object.values(d.struktur[rusun]).forEach(jml=>{
-      rusunData[rusun].terisi += jml;
-    });
-  });
-
-  // hitung ulang total unit, siap, rusak per rusun
-  // (pakai request kedua agar akurat per rusun)
-  const all = await fetch('/api/data?action=raw').then(r=>r.json());
-
-  all.data.forEach(r=>{
-    const unit = String(r.Unit||"");
-    const kondisi = String(r["Kondisi Unit"]||"").toLowerCase();
-    const rusun = unit.startsWith("GM-") ? "Ganda Maghfirah" :
-                  unit.startsWith("TK-") ? "Teluk Kelayan" : null;
-
-    if(!rusun) return;
-
-    rusunData[rusun].total++;
-
-    if(kondisi==="terisi") rusunData[rusun].terisi++;
-    else if(kondisi==="siap huni") rusunData[rusun].siap++;
-    else if(kondisi==="rusak") rusunData[rusun].rusak++;
-  });
-
-  renderPerRusun(rusunData);
+  /* =====================
+     PER RUSUN
+  ===================== */
+  renderPerRusun(d.perRusun);
 
   lastUpdate.innerText = "Update terakhir: " + new Date().toLocaleString("id-ID");
 }
 
 function renderPerRusun(data){
   let html = "";
+
   Object.keys(data).forEach(r=>{
     const x = data[r];
-    const persen = x.total ? ((x.terisi/x.total)*100).toFixed(1) : 0;
+    const persen = x.total ? ((x.terisi / x.total) * 100).toFixed(1) : 0;
 
     html += `
     <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl shadow-xl border border-gray-800">
@@ -98,6 +72,7 @@ function renderPerRusun(data){
       </div>
     </div>`;
   });
+
   perRusun.innerHTML = html;
 }
 
