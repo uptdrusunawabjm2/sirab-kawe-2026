@@ -10,15 +10,15 @@
 
 <div class="max-w-7xl mx-auto p-6">
 
-<h1 class="text-3xl font-bold mb-8">
-  🏢 Rusunawa Kota Banjarmasin
+<h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
+  Rusunawa Kota Banjarmasin
 </h1>
 
 <!-- DASHBOARD UTAMA -->
 <div id="cards" class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-12"></div>
 
 <!-- DASHBOARD PER RUSUN -->
-<h2 class="text-xl font-bold mb-4">🏘️ Dashboard per Rusun</h2>
+<h2 class="text-xl font-bold mb-4 flex items-center gap-2">Dashboard Rusunawa</h2>
 <div id="perRusun" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
 <p id="lastUpdate" class="text-gray-400 text-sm mt-10"></p>
@@ -47,27 +47,41 @@ async function load(){
   `;
 
   /* =====================
-     PER RUSUN
-     (dihitung ulang dari struktur + total global)
+     PER RUSUN (UI BAGUS)
   ===================== */
-  renderPerRusun(d.struktur);
+  renderPerRusun(d);
 
   lastUpdate.innerText = "Update terakhir: " + new Date().toLocaleString("id-ID");
 }
 
-function renderPerRusun(struktur){
+function renderPerRusun(d){
   let html = "";
 
-  Object.keys(struktur).forEach(r=>{
+  Object.keys(d.struktur).forEach(rusun=>{
     let terisi = 0;
-    Object.values(struktur[r]).forEach(v=>{
+    Object.values(d.struktur[rusun]).forEach(v=>{
       terisi += Number(v||0);
     });
 
+    // proporsi dari total (estimasi adil karena semua dari Sheet1)
+    const rasio = d.unitTerisi ? terisi / d.unitTerisi : 0;
+
+    const total = Math.round(d.totalUnit * rasio);
+    const siap  = Math.round(d.unitSiapHuni * rasio);
+    const rusak = Math.round(d.unitRusak * rasio);
+
+    const persen = total ? ((terisi/total)*100).toFixed(1) : 0;
+
     html += `
     <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl shadow-xl border border-gray-800">
-      <h3 class="text-lg font-bold mb-3">${r}</h3>
-      <div class="text-sm text-blue-400 font-bold">${terisi} unit terisi</div>
+      <h3 class="text-lg font-bold mb-4">${rusun}</h3>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div>Total Unit</div><div class="text-right font-bold">${total}</div>
+        <div>Terisi</div><div class="text-right text-blue-400 font-bold">${terisi}</div>
+        <div>Siap Huni</div><div class="text-right text-green-400 font-bold">${siap}</div>
+        <div>Rusak</div><div class="text-right text-red-400 font-bold">${rusak}</div>
+        <div>Hunian</div><div class="text-right text-purple-400 font-bold">${persen} %</div>
+      </div>
     </div>`;
   });
 
