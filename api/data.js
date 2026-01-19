@@ -4,13 +4,13 @@ export default async function handler(req, res) {
   const GAS_URL = "https://script.google.com/macros/s/AKfycbzjABRVgRaoMj3Y1gCU_DRJpnZIvkGwxRRxmPW6buV1POsQ87GQCLAeEBG5j9jJZux7iQ/exec";
 
   let url = GAS_URL + "?action=" + action;
-  if (key) url += "&key=" + key;
+  if(key) url += "&key=" + key;
 
-  try {
+  try{
     const r = await fetch(url);
     const j = await r.json();
     res.status(200).json(j);
-  } catch (e) {
-    res.status(500).json({ status:false, message:e.toString() });
+  }catch(e){
+    res.status(500).json({status:false,message:e.toString()});
   }
 }
