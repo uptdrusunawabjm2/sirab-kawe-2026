@@ -31,74 +31,44 @@ async function load(){
   const j = await r.json();
   const d = j.data;
 
-  /* =====================
-     GLOBAL
-  ===================== */
-  const persenGlobal = d.totalUnit 
-    ? ((d.unitTerisi / d.totalUnit) * 100).toFixed(1) 
-    : 0;
+  const g = d.global;
+  const persenGlobal = g.total ? ((g.terisi/g.total)*100).toFixed(1) : 0;
 
   cards.innerHTML = `
-    ${card("Total Unit", d.totalUnit, "from-slate-700 to-slate-800")}
-    ${card("Siap Huni", d.unitSiapHuni, "from-green-600 to-green-700")}
-    ${card("Terisi", d.unitTerisi, "from-blue-600 to-blue-700")}
-    ${card("Rusak", d.unitRusak, "from-red-600 to-red-700")}
-    ${card("Hunian", persenGlobal + " %", "from-purple-600 to-purple-700")}
+    ${card("Total Unit", g.total, "from-slate-700 to-slate-800")}
+    ${card("Siap Huni", g.siap, "from-green-600 to-green-700")}
+    ${card("Terisi", g.terisi, "from-blue-600 to-blue-700")}
+    ${card("Rusak", g.rusak, "from-red-600 to-red-700")}
+    ${card("Hunian", persenGlobal+" %", "from-purple-600 to-purple-700")}
   `;
 
-  /* =====================
-     PER RUSUN (UI BAGUS)
-  ===================== */
-  renderPerRusun(d);
+  renderPerRusun(d.perRusun);
 
   lastUpdate.innerText = "Update terakhir: " + new Date().toLocaleString("id-ID");
 }
 
-function renderPerRusun(d){
-  let html = "";
-
-  Object.keys(d.struktur).forEach(rusun=>{
-    let terisi = 0;
-    Object.values(d.struktur[rusun]).forEach(v=>{
-      terisi += Number(v||0);
-    });
-
-    // proporsi dari total (estimasi adil karena semua dari Sheet1)
-    const rasio = d.unitTerisi ? terisi / d.unitTerisi : 0;
-
-    const total = Math.round(d.totalUnit * rasio);
-    const siap  = Math.round(d.unitSiapHuni * rasio);
-    const rusak = Math.round(d.unitRusak * rasio);
-
-    const persen = total ? ((terisi/total)*100).toFixed(1) : 0;
+function renderPerRusun(data){
+  let html="";
+  Object.keys(data).forEach(r=>{
+    const x=data[r];
+    const persen = x.total ? ((x.terisi/x.total)*100).toFixed(1) : 0;
 
     html += `
     <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl shadow-xl border border-gray-800">
-      <h3 class="text-lg font-bold mb-4">${rusun}</h3>
+      <h3 class="text-lg font-bold mb-4">${r}</h3>
       <div class="grid grid-cols-2 gap-3 text-sm">
-        <div>Total Unit</div><div class="text-right font-bold">${total}</div>
-        <div>Terisi</div><div class="text-right text-blue-400 font-bold">${terisi}</div>
-        <div>Siap Huni</div><div class="text-right text-green-400 font-bold">${siap}</div>
-        <div>Rusak</div><div class="text-right text-red-400 font-bold">${rusak}</div>
+        <div>Total Unit</div><div class="text-right font-bold">${x.total}</div>
+        <div>Terisi</div><div class="text-right text-blue-400 font-bold">${x.terisi}</div>
+        <div>Siap Huni</div><div class="text-right text-green-400 font-bold">${x.siap}</div>
+        <div>Rusak</div><div class="text-right text-red-400 font-bold">${x.rusak}</div>
         <div>Hunian</div><div class="text-right text-purple-400 font-bold">${persen} %</div>
       </div>
     </div>`;
   });
-
-  perRusun.innerHTML = html;
+  perRusun.innerHTML=html;
 }
-
-function card(title, value, gradient){
-  return `
-  <div class="bg-gradient-to-br ${gradient} p-7 rounded-2xl shadow-xl">
-    <div class="text-sm opacity-80 mb-1">${title}</div>
-    <div class="text-4xl font-bold tracking-wide">${value}</div>
-  </div>`;
-}
-
-load();
-setInterval(load, 60000);
 </script>
+
 
 </body>
 </html>
