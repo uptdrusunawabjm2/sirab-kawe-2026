@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   const { action, key } = req.query;
 
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbzjABRVgRaoMj3Y1gCU_DRJpnZlvkGwxRRxmPW6buV1POsQ87GQCLAeEBG5j9jZux7iQ/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbzjABRVgRaoMj3Y1gCU_DRJpnZIvkGwxRRxmPW6buV1POsQ87GQCLAeEBG5j9jJZux7iQ/exec";
 
   let url = GAS_URL + "?action=" + action;
   if (key) url += "&key=" + key;
