@@ -11,14 +11,17 @@
 <div class="max-w-7xl mx-auto p-6">
 
 <h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
-  Rusunawa Kota Banjarmasin
+  🏢 Rusunawa Kota Banjarmasin
 </h1>
 
-<!-- DASHBOARD UTAMA -->
+<!-- ERROR BOX -->
+<div id="errorBox" class="hidden bg-red-900/40 border border-red-700 text-red-300 p-4 rounded-xl mb-6"></div>
+
+<!-- DASHBOARD GLOBAL -->
 <div id="cards" class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-12"></div>
 
 <!-- DASHBOARD PER RUSUN -->
-<h2 class="text-xl font-bold mb-4 flex items-center gap-2">Dashboard Rusunawa</h2>
+<h2 class="text-xl font-bold mb-4">🏘️ Dashboard per Rusun</h2>
 <div id="perRusun" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
 
 <p id="lastUpdate" class="text-gray-400 text-sm mt-10"></p>
@@ -27,31 +30,45 @@
 
 <script>
 async function load(){
-  const r = await fetch('/api/data?action=public');
-  const j = await r.json();
-  const d = j.data;
+  try {
+    const r = await fetch('/api/data?action=public');
+    const j = await r.json();
 
-  const g = d.global;
-  const persenGlobal = g.total ? ((g.terisi/g.total)*100).toFixed(1) : 0;
+    if(!j.status || !j.data || !j.data.global){
+      throw "Format API tidak sesuai. Pastikan Code.gs versi terakhir sudah ter-deploy.";
+    }
 
-  cards.innerHTML = `
-    ${card("Total Unit", g.total, "from-slate-700 to-slate-800")}
-    ${card("Siap Huni", g.siap, "from-green-600 to-green-700")}
-    ${card("Terisi", g.terisi, "from-blue-600 to-blue-700")}
-    ${card("Rusak", g.rusak, "from-red-600 to-red-700")}
-    ${card("Hunian", persenGlobal+" %", "from-purple-600 to-purple-700")}
-  `;
+    const d = j.data;
+    const g = d.global;
 
-  renderPerRusun(d.perRusun);
+    const persenGlobal = g.total ? ((g.terisi / g.total) * 100).toFixed(1) : 0;
 
-  lastUpdate.innerText = "Update terakhir: " + new Date().toLocaleString("id-ID");
+    // ===== GLOBAL =====
+    cards.innerHTML = `
+      ${card("Total Unit", g.total, "from-slate-700 to-slate-800")}
+      ${card("Siap Huni", g.siap, "from-green-600 to-green-700")}
+      ${card("Terisi", g.terisi, "from-blue-600 to-blue-700")}
+      ${card("Rusak", g.rusak, "from-red-600 to-red-700")}
+      ${card("Hunian", persenGlobal + " %", "from-purple-600 to-purple-700")}
+    `;
+
+    // ===== PER RUSUN =====
+    renderPerRusun(d.perRusun);
+
+    lastUpdate.innerText = "Update terakhir: " + new Date().toLocaleString("id-ID");
+
+  } catch(err){
+    errorBox.classList.remove("hidden");
+    errorBox.innerText = "Gagal memuat data: " + err;
+    console.error(err);
+  }
 }
 
 function renderPerRusun(data){
-  let html="";
+  let html = "";
   Object.keys(data).forEach(r=>{
-    const x=data[r];
-    const persen = x.total ? ((x.terisi/x.total)*100).toFixed(1) : 0;
+    const x = data[r];
+    const persen = x.total ? ((x.terisi / x.total) * 100).toFixed(1) : 0;
 
     html += `
     <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl shadow-xl border border-gray-800">
@@ -65,10 +82,21 @@ function renderPerRusun(data){
       </div>
     </div>`;
   });
-  perRusun.innerHTML=html;
-}
-</script>
 
+  perRusun.innerHTML = html;
+}
+
+function card(title, value, gradient){
+  return `
+  <div class="bg-gradient-to-br ${gradient} p-7 rounded-2xl shadow-xl">
+    <div class="text-sm opacity-80 mb-1">${title}</div>
+    <div class="text-4xl font-bold tracking-wide">${value}</div>
+  </div>`;
+}
+
+load();
+setInterval(load, 60000);
+</script>
 
 </body>
 </html>
