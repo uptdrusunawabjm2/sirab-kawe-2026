@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Rusunawa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="bg-gray-950 text-gray-100">
+
+<div class="max-w-7xl mx-auto p-6">
+
+<h1 class="text-3xl font-bold mb-6">🏢 Dashboard Rusunawa</h1>
+
+<!-- CARDS -->
+<div id="cards" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10"></div>
+
+<!-- GRAFIK -->
+<div class="bg-gray-900 p-5 rounded-xl border border-gray-800 mb-10">
+<h3 class="font-bold mb-3">Jumlah Penghuni per Lantai</h3>
+<canvas id="chart"></canvas>
+</div>
+
+<!-- STRUKTUR -->
+<div id="struktur" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+</div>
+
+<script>
+async function load(){
+  const r = await fetch('/api/data?action=public');
+  const j = await r.json();
+  const d = j.data;
+
+  cards.innerHTML = `
+    ${card("Jumlah Penghuni", d.totalPenghuni)}
+    ${card("Unit Terisi", d.unitTerisi)}
+    ${card("Kondisi Rusak", d.unitRusak)}
+  `;
+
+  renderStruktur(d.struktur);
+  drawChart(d.struktur);
+}
+
+function card(t,v){
+  return `<div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700">
+    <div class="text-gray-400">${t}</div>
+    <div class="text-3xl font-bold">${v}</div>
+  </div>`;
+}
+
+function renderStruktur(data){
+  let html = "";
+  Object.keys(data).forEach(rusun=>{
+    html += `<div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+      <h3 class="font-bold mb-3">${rusun}</h3>`;
+    Object.keys(data[rusun]).forEach(l=>{
+      html += `<div class="flex justify-between text-sm border-b border-gray-800 py-1">
+        <span>Lantai ${l}</span>
+        <span>${data[rusun][l]} penghuni</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  struktur.innerHTML = html;
+}
+
+function drawChart(data){
+  let labels=[], values=[];
+  Object.keys(data).forEach(r=>{
+    Object.keys(data[r]).forEach(l=>{
+      labels.push(r+" Lantai "+l);
+      values.push(data[r][l]);
+    });
+  });
+
+  new Chart(chart,{
+    type:'bar',
+    data:{labels, datasets:[{data:values}]}
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
