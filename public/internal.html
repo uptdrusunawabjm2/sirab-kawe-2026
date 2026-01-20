@@ -4,6 +4,48 @@
 <meta charset="UTF-8" />
 <title>Dashboard Internal Rusun</title>
 <script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+.badge-terisi {
+  background: rgba(34,197,94,.15);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,.4);
+}
+.badge-rusak {
+  background: rgba(239,68,68,.15);
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,.4);
+}
+.badge-siap {
+  background: rgba(234,179,8,.15);
+  color: #eab308;
+  border: 1px solid rgba(234,179,8,.4);
+}
+.pagination button {
+  padding: 6px 12px;
+  margin: 0 2px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: white;
+  cursor: pointer;
+}
+.pagination button.active {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+</style>
 </head>
 
 <body class="bg-slate-950 text-white">
@@ -32,7 +74,16 @@
   <!-- TABLE -->
   <div class="bg-slate-900 rounded p-5">
     <h3 class="font-bold mb-4">Daftar Penghuni</h3>
-    <input id="search" placeholder="Cari unit / nama..." class="w-full p-2 mb-4 bg-slate-800 rounded">
+
+    <div class="flex gap-3 mb-4">
+      <input id="searchInput" placeholder="Cari unit / nama..." class="flex-1 p-2 bg-slate-800 rounded">
+      <select id="statusFilter" class="p-2 bg-slate-800 rounded">
+        <option value="">Semua Status</option>
+        <option value="TERISI">Terisi</option>
+        <option value="RUSAK">Rusak</option>
+        <option value="SIAP">Siap Huni</option>
+      </select>
+    </div>
 
     <table class="w-full text-sm">
       <thead class="border-b border-slate-700">
@@ -46,6 +97,8 @@
       </thead>
       <tbody id="tbody"></tbody>
     </table>
+
+    <div id="pagination" class="pagination mt-4"></div>
   </div>
 </div>
 </div>
@@ -56,7 +109,15 @@ const unitTerisi = document.getElementById("unitTerisi");
 const totalBayar = document.getElementById("totalBayar");
 const totalTunggakan = document.getElementById("totalTunggakan");
 const tbody = document.getElementById("tbody");
-const search = document.getElementById("search");
+
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+const pagination = document.getElementById("pagination");
+
+let allData = [];
+let filteredData = [];
+let currentPage = 1;
+const rowsPerPage = 25;
 
 async function loadData(){
   const res = await fetch("/api/data?action=internal&key=rusun2026");
@@ -70,39 +131,88 @@ async function loadData(){
   totalBayar.innerText = "Rp " + Number(sum.totalBayar).toLocaleString("id-ID");
   totalTunggakan.innerText = "Rp " + Number(sum.totalTunggakan).toLocaleString("id-ID");
 
-  render(data);
+  allData = data;
+  filteredData = data;
+  renderTable();
 }
 
-function warnaStatus(status){
-  status = status.toLowerCase();
-  if(status.includes("terisi")) return "text-green-400 font-semibold";
-  if(status.includes("rusak")) return "text-red-400 font-semibold";
-  if(status.includes("siap")) return "text-yellow-400 font-semibold";
-  return "text-slate-300";
+function badgeStatus(status){
+  if(!status) return "-";
+  const s = status.toLowerCase();
+  if(s.includes("terisi")) return `<span class="badge badge-terisi">Terisi</span>`;
+  if(s.includes("rusak")) return `<span class="badge badge-rusak">Rusak</span>`;
+  if(s.includes("siap")) return `<span class="badge badge-siap">Siap Huni</span>`;
+  return status;
 }
 
-function render(data){
+function applyFilter(){
+  const search = searchInput.value.toLowerCase();
+  const status = statusFilter.value;
+
+  filteredData = allData.filter(d=>{
+    const unit = (d.unit||"").toLowerCase();
+    const nama = (d.nama||"").toLowerCase();
+    const st = (d.kondisiunit||"").toUpperCase();
+
+    const cocokSearch = unit.includes(search) || nama.includes(search);
+    const cocokStatus = !status || st.includes(status);
+
+    return cocokSearch && cocokStatus;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable(){
   tbody.innerHTML = "";
-  data.forEach(d=>{
-    const tr = document.createElement("tr");
 
-    tr.innerHTML = `
-      <td class="py-1 uppercase">${d.unit}</td>
-      <td>${d.nama}</td>
-      <td class="${warnaStatus(d.kondisiunit)}">${d.kondisiunit}</td>
-      <td>Rp ${Number(d.pembayaran).toLocaleString("id-ID")}</td>
-      <td>Rp ${Number(d.tunggakan).toLocaleString("id-ID")}</td>
+  const start = (currentPage-1)*rowsPerPage;
+  const end = start + rowsPerPage;
+  const pageData = filteredData.slice(start,end);
+
+  pageData.forEach(d=>{
+    tbody.innerHTML += `
+      <tr class="border-b border-slate-800">
+        <td class="py-1 uppercase">${d.unit||""}</td>
+        <td>${d.nama||""}</td>
+        <td>${badgeStatus(d.kondisiunit)}</td>
+        <td>Rp ${Number(d.pembayaran||0).toLocaleString("id-ID")}</td>
+        <td>Rp ${Number(d.tunggakan||0).toLocaleString("id-ID")}</td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
+
+  renderPagination();
 }
 
-search.addEventListener("input",()=>{
-  const v = search.value.toLowerCase();
-  document.querySelectorAll("#tbody tr").forEach(tr=>{
-    tr.style.display = tr.innerText.toLowerCase().includes(v) ? "" : "none";
-  });
-});
+function renderPagination(){
+  pagination.innerHTML="";
+  const totalPage = Math.ceil(filteredData.length / rowsPerPage);
+
+  const prev = document.createElement("button");
+  prev.textContent="Prev";
+  prev.disabled = currentPage===1;
+  prev.onclick=()=>{currentPage--;renderTable();};
+  pagination.appendChild(prev);
+
+  for(let i=1;i<=totalPage;i++){
+    const b=document.createElement("button");
+    b.textContent=i;
+    if(i===currentPage) b.classList.add("active");
+    b.onclick=()=>{currentPage=i;renderTable();};
+    pagination.appendChild(b);
+  }
+
+  const next = document.createElement("button");
+  next.textContent="Next";
+  next.disabled = currentPage===totalPage;
+  next.onclick=()=>{currentPage++;renderTable();};
+  pagination.appendChild(next);
+}
+
+searchInput.addEventListener("input", applyFilter);
+statusFilter.addEventListener("change", applyFilter);
 
 loadData();
 </script>
