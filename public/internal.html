@@ -13,38 +13,17 @@
   font-weight: 600;
   display: inline-block;
 }
-.badge-terisi {
-  background: rgba(34,197,94,.15);
-  color: #22c55e;
-  border: 1px solid rgba(34,197,94,.4);
-}
-.badge-rusak {
-  background: rgba(239,68,68,.15);
-  color: #ef4444;
-  border: 1px solid rgba(239,68,68,.4);
-}
-.badge-siap {
-  background: rgba(234,179,8,.15);
-  color: #eab308;
-  border: 1px solid rgba(234,179,8,.4);
-}
+.badge-terisi {background: rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.4);}
+.badge-rusak {background: rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.4);}
+.badge-siap {background: rgba(234,179,8,.15);color:#eab308;border:1px solid rgba(234,179,8,.4);}
 .pagination button {
-  padding: 6px 12px;
-  margin: 0 2px;
-  border-radius: 8px;
-  border: 1px solid #334155;
-  background: #020617;
-  color: white;
-  cursor: pointer;
+  padding:6px 12px;margin:0 2px;border-radius:8px;
+  border:1px solid #334155;background:#020617;color:white;cursor:pointer;
 }
-.pagination button.active {
-  background: #2563eb;
-  border-color: #2563eb;
-}
-.pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.pagination button.active {background:#2563eb;border-color:#2563eb;}
+.pagination button:disabled {opacity:.4;cursor:not-allowed;}
+.menu-link {display:block;padding:8px 10px;border-radius:8px;}
+.menu-link:hover {background:#020617;}
 </style>
 </head>
 
@@ -53,10 +32,22 @@
 <div class="flex">
 
 <!-- SIDEBAR -->
-<div class="w-64 bg-slate-900 min-h-screen p-5">
+<div class="w-64 bg-slate-900 min-h-screen p-5 flex flex-col">
   <h1 class="text-xl font-bold mb-6">🏠 RUSUN DASHBOARD</h1>
-  <div class="text-slate-300 mb-2">Manajemen Penghuni</div>
-  <a href="/login.html" class="text-red-400 mt-10 inline-block">Logout</a>
+
+  <a class="menu-link text-slate-200">Manajemen Penghuni</a>
+
+  <a href="https://kk-terima-2026.vercel.app/" target="_blank" class="menu-link text-slate-300">
+    📄 KK Sewa 2026
+  </a>
+
+  <a href="https://tgk-rusun-2026.vercel.app/" target="_blank" class="menu-link text-slate-300">
+    💸 Tunggakan 2026
+  </a>
+
+  <div class="mt-auto">
+    <a href="/login.html" class="text-red-400">Logout</a>
+  </div>
 </div>
 
 <!-- MAIN -->
@@ -104,41 +95,31 @@
 </div>
 
 <script>
-const penghuni = document.getElementById("penghuni");
-const unitTerisi = document.getElementById("unitTerisi");
-const totalBayar = document.getElementById("totalBayar");
-const totalTunggakan = document.getElementById("totalTunggakan");
-const tbody = document.getElementById("tbody");
+const penghuni=document.getElementById("penghuni"),
+unitTerisi=document.getElementById("unitTerisi"),
+totalBayar=document.getElementById("totalBayar"),
+totalTunggakan=document.getElementById("totalTunggakan"),
+tbody=document.getElementById("tbody"),
+searchInput=document.getElementById("searchInput"),
+statusFilter=document.getElementById("statusFilter"),
+pagination=document.getElementById("pagination");
 
-const searchInput = document.getElementById("searchInput");
-const statusFilter = document.getElementById("statusFilter");
-const pagination = document.getElementById("pagination");
-
-let allData = [];
-let filteredData = [];
-let currentPage = 1;
-const rowsPerPage = 25;
+let allData=[],filteredData=[],currentPage=1,rowsPerPage=25;
 
 async function loadData(){
-  const res = await fetch("/api/data?action=internal&key=rusun2026");
-  const json = await res.json();
-
-  const sum = json.data.summary;
-  const data = json.data.data;
-
-  penghuni.innerText = sum.penghuni;
-  unitTerisi.innerText = sum.terisi;
-  totalBayar.innerText = "Rp " + Number(sum.totalBayar).toLocaleString("id-ID");
-  totalTunggakan.innerText = "Rp " + Number(sum.totalTunggakan).toLocaleString("id-ID");
-
-  allData = data;
-  filteredData = data;
-  renderTable();
+  const res=await fetch("/api/data?action=internal&key=rusun2026");
+  const json=await res.json();
+  const sum=json.data.summary,data=json.data.data;
+  penghuni.innerText=sum.penghuni;
+  unitTerisi.innerText=sum.terisi;
+  totalBayar.innerText="Rp "+Number(sum.totalBayar).toLocaleString("id-ID");
+  totalTunggakan.innerText="Rp "+Number(sum.totalTunggakan).toLocaleString("id-ID");
+  allData=data;filteredData=data;renderTable();
 }
 
 function badgeStatus(status){
   if(!status) return "-";
-  const s = status.toLowerCase();
+  const s=status.toLowerCase();
   if(s.includes("terisi")) return `<span class="badge badge-terisi">Terisi</span>`;
   if(s.includes("rusak")) return `<span class="badge badge-rusak">Rusak</span>`;
   if(s.includes("siap")) return `<span class="badge badge-siap">Siap Huni</span>`;
@@ -146,74 +127,55 @@ function badgeStatus(status){
 }
 
 function applyFilter(){
-  const search = searchInput.value.toLowerCase();
-  const status = statusFilter.value;
-
-  filteredData = allData.filter(d=>{
-    const unit = (d.unit||"").toLowerCase();
-    const nama = (d.nama||"").toLowerCase();
-    const st = (d.kondisiunit||"").toUpperCase();
-
-    const cocokSearch = unit.includes(search) || nama.includes(search);
-    const cocokStatus = !status || st.includes(status);
-
-    return cocokSearch && cocokStatus;
+  const search=searchInput.value.toLowerCase(),status=statusFilter.value;
+  filteredData=allData.filter(d=>{
+    const unit=(d.unit||"").toLowerCase(),
+          nama=(d.nama||"").toLowerCase(),
+          st=(d.kondisiunit||"").toUpperCase();
+    return (unit.includes(search)||nama.includes(search)) && (!status||st.includes(status));
   });
-
-  currentPage = 1;
-  renderTable();
+  currentPage=1;renderTable();
 }
 
 function renderTable(){
-  tbody.innerHTML = "";
-
-  const start = (currentPage-1)*rowsPerPage;
-  const end = start + rowsPerPage;
-  const pageData = filteredData.slice(start,end);
-
-  pageData.forEach(d=>{
-    tbody.innerHTML += `
-      <tr class="border-b border-slate-800">
-        <td class="py-1 uppercase">${d.unit||""}</td>
-        <td>${d.nama||""}</td>
-        <td>${badgeStatus(d.kondisiunit)}</td>
-        <td>Rp ${Number(d.pembayaran||0).toLocaleString("id-ID")}</td>
-        <td>Rp ${Number(d.tunggakan||0).toLocaleString("id-ID")}</td>
-      </tr>
-    `;
+  tbody.innerHTML="";
+  const start=(currentPage-1)*rowsPerPage;
+  filteredData.slice(start,start+rowsPerPage).forEach(d=>{
+    tbody.innerHTML+=`
+    <tr class="border-b border-slate-800">
+      <td class="py-1 uppercase">${d.unit||""}</td>
+      <td>${d.nama||""}</td>
+      <td>${badgeStatus(d.kondisiunit)}</td>
+      <td>Rp ${Number(d.pembayaran||0).toLocaleString("id-ID")}</td>
+      <td>Rp ${Number(d.tunggakan||0).toLocaleString("id-ID")}</td>
+    </tr>`;
   });
-
   renderPagination();
 }
 
 function renderPagination(){
   pagination.innerHTML="";
-  const totalPage = Math.ceil(filteredData.length / rowsPerPage);
-
-  const prev = document.createElement("button");
-  prev.textContent="Prev";
-  prev.disabled = currentPage===1;
+  const totalPage=Math.ceil(filteredData.length/rowsPerPage);
+  const prev=document.createElement("button");
+  prev.textContent="Prev";prev.disabled=currentPage===1;
   prev.onclick=()=>{currentPage--;renderTable();};
   pagination.appendChild(prev);
 
   for(let i=1;i<=totalPage;i++){
     const b=document.createElement("button");
-    b.textContent=i;
-    if(i===currentPage) b.classList.add("active");
+    b.textContent=i;if(i===currentPage)b.classList.add("active");
     b.onclick=()=>{currentPage=i;renderTable();};
     pagination.appendChild(b);
   }
 
-  const next = document.createElement("button");
-  next.textContent="Next";
-  next.disabled = currentPage===totalPage;
+  const next=document.createElement("button");
+  next.textContent="Next";next.disabled=currentPage===totalPage;
   next.onclick=()=>{currentPage++;renderTable();};
   pagination.appendChild(next);
 }
 
-searchInput.addEventListener("input", applyFilter);
-statusFilter.addEventListener("change", applyFilter);
-
+searchInput.addEventListener("input",applyFilter);
+statusFilter.addEventListener("change",applyFilter);
 loadData();
 </script>
 </body>
