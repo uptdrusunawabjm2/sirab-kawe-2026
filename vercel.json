@@ -1,14 +1,4 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false,
-  "routes": [
-    { "src": "^/api/(.*)", "dest": "/api/$1" },
-
-    { "src": "^/$", "dest": "/public/public.html" },
-
-    { "src": "^/login$", "dest": "/public/login.html" },
-    { "src": "^/internal$", "dest": "/public/internal.html" },
-
-    { "src": "^(.*)$", "dest": "/public/$1" }
-  ]
+  "trailingSlash": false
 }
