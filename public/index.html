@@ -44,7 +44,7 @@ async function load(){
     ${card("Siap Huni", g.siap, "from-green-600 to-green-700")}
     ${card("Terisi", g.terisi, "from-blue-600 to-blue-700")}
     ${card("Rusak", g.rusak, "from-red-600 to-red-700")}
-    ${card("Hunian", persenGlobal + " %", "from-purple-600 to-purple-700")}
+    ${card("Persentase", persenGlobal + " %", "from-purple-600 to-purple-700")}
   `;
 
   /* ===== PER RUSUN ===== */
@@ -70,7 +70,7 @@ function renderPanel(container, data){
         <div>Terisi</div><div class="text-right text-blue-400 font-bold">${x.terisi}</div>
         <div>Siap Huni</div><div class="text-right text-green-400 font-bold">${x.siap}</div>
         <div>Rusak</div><div class="text-right text-red-400 font-bold">${x.rusak}</div>
-        <div>Hunian</div><div class="text-right text-purple-400 font-bold">${persen} %</div>
+        <div>Persentase</div><div class="text-right text-purple-400 font-bold">${persen} %</div>
       </div>
     </div>`;
   });
@@ -91,4 +91,5 @@ setInterval(load, 60000);
 
 </body>
 </html>
+
 
