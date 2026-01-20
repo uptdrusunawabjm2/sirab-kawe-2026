@@ -17,14 +17,22 @@
     MASUK
   </button>
 
-  <p id="msg" class="text-red-400 text-sm mt-3 text-center hidden">Login gagal</p>
+  <p id="msg" class="text-red-400 text-sm mt-3 text-center hidden">
+    Username atau password salah
+  </p>
 </div>
 
 <script>
 async function doLogin(){
   const user = username.value.trim();
   const pass = password.value.trim();
-  if(!user || !pass) return;
+  msg.classList.add("hidden");
+
+  if(!user || !pass){
+    msg.textContent = "Username dan password wajib diisi";
+    msg.classList.remove("hidden");
+    return;
+  }
 
   try{
     const res = await fetch("/api/login",{
@@ -33,21 +41,28 @@ async function doLogin(){
         "Content-Type":"application/json",
         "X-Requested-With":"XMLHttpRequest"
       },
-      body:JSON.stringify({username:user,password:pass})
+      body: JSON.stringify({
+        username: user,
+        password: pass
+      })
     });
 
     const json = await res.json();
 
     if(json.status){
-      // ✅ SESSION BROWSER
+      // ✅ SIMPAN SESSION
       sessionStorage.setItem("RUSUN_LOGIN","OK");
       sessionStorage.setItem("RUSUN_USER",user);
+
+      // ➜ MASUK INTERNAL
       location.href="/internal.html";
     }else{
+      msg.textContent = "Username atau password salah";
       msg.classList.remove("hidden");
     }
   }catch(e){
-    alert("Server error");
+    msg.textContent = "Server error";
+    msg.classList.remove("hidden");
   }
 }
 </script>
