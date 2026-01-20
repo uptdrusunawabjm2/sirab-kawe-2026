@@ -1,4 +1,11 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "routes": [
+    { "src": "^/api/(.*)", "dest": "/api/$1" },
+
+    { "src": "^/$", "dest": "/public/public.html" },
+
+    { "src": "^/(.*)", "dest": "/public/$1" }
+  ]
 }
