@@ -10,7 +10,7 @@ export default function handler(req, res) {
     // GANTI USERNAME & PASSWORD
     // =========================
     const USERNAME = "admin";
-    const PASSWORD = "Rusun@2026!";
+    const PASSWORD = "Rusun#2026!";
 
     if (username === USERNAME && password === PASSWORD) {
       return res.status(200).json({ status: true });
