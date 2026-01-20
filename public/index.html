@@ -61,29 +61,37 @@
 
 <script>
 const tbody = document.getElementById("tbody");
-const tp = document.getElementById("tp");
-const ut = document.getElementById("ut");
-const tb = document.getElementById("tb");
-const tt = document.getElementById("tt");
+const tp = document.getElementById("tp"); // penghuni
+const ut = document.getElementById("ut"); // unit terisi
+const tb = document.getElementById("tb"); // total bayar
+const tt = document.getElementById("tt"); // total tunggakan
 const search = document.getElementById("search");
 
 let ALL = [];
 
-fetch("https://script.google.com/macros/s/AKfycbzjABRVgRaoMj3Y1gCU_DRJpnZIvkGwxRRxmPW6buV1POsQ87GQCLAeEBG5j9jJZux7iQ/exec?action=internal&key=rusun2026")
- .then(r=>r.json())
- .then(res=>{
-   console.log("API INTERNAL:", res);
-    const sum = res.data.summary;
+// PAKAI PROXY VERCEL
+fetch("/api/data?action=internal&key=rusun2026")
+ .then(r => r.json())
+ .then(res => {
+    console.log("API INTERNAL:", res);
+
+    const sum  = res.data.summary;
     const data = res.data.data;
 
-    penghuni.innerText = sum.penghuni;
-    unitTerisi.innerText = sum.terisi;
-    totalBayar.innerText = "Rp " + sum.totalBayar.toLocaleString("id-ID");
-    totalTunggakan.innerText = "Rp " + sum.totalTunggakan.toLocaleString("id-ID");
+    // CARD
+    tp.innerText = sum.penghuni;
+    ut.innerText = sum.terisi;
+    tb.innerText = "Rp " + Number(sum.totalBayar).toLocaleString("id-ID");
+    tt.innerText = "Rp " + Number(sum.totalTunggakan).toLocaleString("id-ID");
+
+    // SIMPAN DATA UNTUK SEARCH
+    ALL = data;
 
     render(data);
+ })
+ .catch(err=>{
+   console.error("ERROR LOAD INTERNAL:", err);
  });
-
 
 function render(data){
   let html = "";
@@ -103,19 +111,15 @@ function render(data){
   tbody.innerHTML = html;
 }
 
-
 search.addEventListener("input", ()=>{
   const q = search.value.toLowerCase();
   const f = ALL.filter(p=>{
     return (p.unit||"").toLowerCase().includes(q) ||
-            (p.nama||"").toLowerCase().includes(q);
+           (p.nama||"").toLowerCase().includes(q);
   });
   render(f);
 });
 </script>
 
 </body>
-
 </html>
-
-
