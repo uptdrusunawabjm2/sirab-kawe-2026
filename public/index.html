@@ -72,6 +72,7 @@ let ALL = [];
 fetch("https://script.google.com/macros/s/AKfycbzjABRVgRaoMj3Y1gCU_DRJpnZIvkGwxRRxmPW6buV1POsQ87GQCLAeEBG5j9jJZux7iQ/exec?action=internal&key=rusun2026")
  .then(r=>r.json())
  .then(res=>{
+   console.log("API INTERNAL:", res);
     const sum = res.data.summary;
     const data = res.data.data;
 
@@ -116,4 +117,5 @@ search.addEventListener("input", ()=>{
 </body>
 
 </html>
+
 
