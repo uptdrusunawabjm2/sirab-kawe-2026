@@ -10,7 +10,8 @@
 
 <div class="max-w-7xl mx-auto p-6">
 
-<h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
+<!-- ✅ JUDUL TENGAH -->
+<h1 class="text-3xl font-bold mb-8 flex items-center justify-center gap-2 text-center">
   Rusunawa Kota Banjarmasin
 </h1>
 
@@ -62,10 +63,20 @@ function renderPanel(container, data){
     const x = data[k];
     const persen = x.total ? ((x.terisi/x.total)*100).toFixed(1) : 0;
 
+    /* ✅ teks alamat kecil (hanya untuk 2 rusun) */
+    let alamat = "";
+    if(k === "Rusunawa Ganda Maghfirah"){
+      alamat = `<div class="text-xs text-gray-400 mt-1">Jl. Tembus Mantuil RT.022, Kel. Kelayan Selatan, Kec. Banjarmasin Selatan, Kota Banjarmasin</div>`;
+    }
+    if(k === "Rusunawa Teluk Kelayan"){
+      alamat = `<div class="text-xs text-gray-400 mt-1">Jl. Teluk Kelayan RT.001, Kel. Kelayan Barat, Kec. Banjarmasin Selatan, Kota Banjarmasin</div>`;
+    }
+
     html += `
     <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl shadow-xl border border-gray-800">
-      <h3 class="text-lg font-bold mb-4">${k}</h3>
-      <div class="grid grid-cols-2 gap-3 text-sm">
+      <h3 class="text-lg font-bold mb-1">${k}</h3>
+      ${alamat}
+      <div class="grid grid-cols-2 gap-3 text-sm mt-4">
         <div>Total Unit</div><div class="text-right font-bold">${x.total}</div>
         <div>Terisi</div><div class="text-right text-blue-400 font-bold">${x.terisi}</div>
         <div>Siap Huni</div><div class="text-right text-green-400 font-bold">${x.siap}</div>
@@ -91,8 +102,3 @@ setInterval(load, 60000);
 
 </body>
 </html>
-
-
-
-
-
