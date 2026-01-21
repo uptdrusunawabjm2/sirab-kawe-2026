@@ -12,12 +12,12 @@
 
 <body class="bg-gray-950 text-gray-100 min-h-screen">
 
-<!-- ================= SIDEBAR KIRI ================= -->
-<div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-slate-900 border-r border-slate-700 p-5 z-50 -translate-x-full">
+<!-- ================= SIDEBAR ================= -->
+<div id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 p-5 z-50 -translate-x-full">
 
-  <h2 class="text-lg font-bold mb-4">📊 Capaian 2026</h2>
+  <h2 class="text-lg font-bold mb-5">📊 Capaian 2026</h2>
 
-  <div class="space-y-4">
+  <div class="space-y-5">
 
     <div class="bg-slate-800 p-4 rounded-xl">
       <div class="text-sm opacity-70">Realisasi</div>
@@ -25,13 +25,13 @@
     </div>
 
     <div class="bg-slate-800 p-4 rounded-xl">
-      <div class="text-sm opacity-70">Target 2026</div>
-      <div id="sbTarget" class="text-2xl font-bold mt-1">Rp 700.000.000</div>
-    </div>
+      <div class="text-sm opacity-70 mb-1">Persentase</div>
+      <div id="sbPersen" class="text-2xl font-bold">0%</div>
 
-    <div class="bg-slate-800 p-4 rounded-xl">
-      <div class="text-sm opacity-70">Persentase</div>
-      <div id="sbPersen" class="text-2xl font-bold mt-1">0%</div>
+      <!-- PROGRESS BAR -->
+      <div class="w-full bg-slate-700 rounded-full h-3 mt-3 overflow-hidden">
+        <div id="sbBar" class="h-3 w-0 rounded-full transition-all duration-500"></div>
+      </div>
     </div>
 
   </div>
@@ -62,6 +62,7 @@ class="fixed top-5 left-5 z-50 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded
 
 </div>
 
+<!-- ================= SCRIPT DASHBOARD ================= -->
 <script>
 async function load(){
   const r = await fetch('/api/data?action=public');
@@ -92,13 +93,11 @@ function renderPanel(container, data){
     const persen = x.total ? ((x.terisi/x.total)*100).toFixed(1) : 0;
 
     let subtitle = "";
-
     if(k === "Ganda Maghfirah"){
       subtitle = `<div class="text-xs text-slate-400 mt-1">
         Jl. Tembus Mantuil RT.022, Kel. Kelayan Selatan, Kec. Banjarmasin Selatan, Kota Banjarmasin
       </div>`;
     }
-
     if(k === "Teluk Kelayan"){
       subtitle = `<div class="text-xs text-slate-400 mt-1">
         Jl. Teluk Kelayan RT.001, Kel. Kelayan Barat, Kec. Banjarmasin Selatan, Kota Banjarmasin
@@ -118,7 +117,6 @@ function renderPanel(container, data){
       </div>
     </div>`;
   });
-
   container.innerHTML = html;
 }
 
@@ -134,7 +132,9 @@ load();
 setInterval(load, 60000);
 </script>
 
+<!-- ================= SCRIPT SIDEBAR ================= -->
 <script>
+/* ===== TARGET BACKGROUND (BISA DIUBAH) ===== */
 const TARGET_2026 = 700000000;
 
 function toggleSidebar(){
@@ -154,10 +154,30 @@ async function loadSidebar(){
     });
 
     document.getElementById("sbRealisasi").innerText = formatRp(total);
-    document.getElementById("sbTarget").innerText = formatRp(TARGET_2026);
 
     const persen = TARGET_2026 ? ((total / TARGET_2026) * 100).toFixed(2) : 0;
-    document.getElementById("sbPersen").innerText = persen + " %";
+    const persenNum = Number(persen);
+
+    const persenEl = document.getElementById("sbPersen");
+    const bar = document.getElementById("sbBar");
+
+    persenEl.innerText = persen + " %";
+    bar.style.width = Math.min(persenNum,100) + "%";
+
+    // ===== WARNA OTOMATIS =====
+    persenEl.className = "text-2xl font-bold";
+    bar.className = "h-3 rounded-full transition-all duration-500";
+
+    if(persenNum < 50){
+      persenEl.classList.add("text-red-400");
+      bar.classList.add("bg-red-500");
+    }else if(persenNum < 80){
+      persenEl.classList.add("text-yellow-400");
+      bar.classList.add("bg-yellow-400");
+    }else{
+      persenEl.classList.add("text-green-400");
+      bar.classList.add("bg-green-500");
+    }
 
   }catch(e){
     console.error("Sidebar error:", e);
@@ -174,5 +194,3 @@ setInterval(loadSidebar, 60000);
 
 </body>
 </html>
-
-
