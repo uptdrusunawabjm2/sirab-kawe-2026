@@ -85,7 +85,6 @@ async function load(){
   lastUpdate.innerText = "Update terakhir: " + new Date().toLocaleString("id-ID");
 }
 
-<script>
 function renderPanel(container, data){
   let html="";
   Object.keys(data).forEach(k=>{
@@ -122,8 +121,6 @@ function renderPanel(container, data){
 
   container.innerHTML = html;
 }
-</script>
-
 
 function card(title, value, gradient){
   return `
@@ -177,4 +174,5 @@ setInterval(loadSidebar, 60000);
 
 </body>
 </html>
+
 
