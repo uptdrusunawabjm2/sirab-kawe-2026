@@ -28,7 +28,6 @@
 <body class="bg-slate-950 text-white">
 
 <script>
-/* 🔐 KUNCI HALAMAN INTERNAL */
 if(sessionStorage.getItem("RUSUN_LOGIN")!=="OK"){
   location.replace("/login.html");
 }
@@ -60,7 +59,6 @@ if(sessionStorage.getItem("RUSUN_LOGIN")!=="OK"){
 <!-- MAIN -->
 <div class="flex-1 p-8">
 
-  <!-- HEADER -->
   <div class="flex items-center gap-4 mb-6">
     <button onclick="toggleSidebar()" class="bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700">☰</button>
     <h2 class="text-2xl font-bold">Dashboard Internal</h2>
@@ -106,17 +104,21 @@ if(sessionStorage.getItem("RUSUN_LOGIN")!=="OK"){
 </div>
 </div>
 
-<script>
-/* UI */
-function toggleSidebar(){
-  sidebar.classList.toggle("collapsed");
-}
-function logout(){
-  sessionStorage.clear();
-  location.href="/login.html";
-}
+<!-- MODAL DETAIL -->
+<div id="modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+  <div class="bg-slate-900 max-w-4xl w-full rounded-xl p-6 overflow-y-auto max-h-[90vh]">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Detail Penghuni</h2>
+      <button onclick="closeModal()" class="text-red-400">✖ Tutup</button>
+    </div>
+    <div id="detailBox" class="grid grid-cols-2 gap-3 text-sm"></div>
+  </div>
+</div>
 
-/* STATE */
+<script>
+function toggleSidebar(){ sidebar.classList.toggle("collapsed"); }
+function logout(){ sessionStorage.clear(); location.href="/login.html"; }
+
 const penghuni=document.getElementById("penghuni"),
 unitTerisi=document.getElementById("unitTerisi"),
 totalBayar=document.getElementById("totalBayar"),
@@ -124,16 +126,15 @@ totalTunggakan=document.getElementById("totalTunggakan"),
 tbody=document.getElementById("tbody"),
 searchInput=document.getElementById("searchInput"),
 statusFilter=document.getElementById("statusFilter"),
-pagination=document.getElementById("pagination");
+pagination=document.getElementById("pagination"),
+modal=document.getElementById("modal"),
+detailBox=document.getElementById("detailBox");
 
 let allData=[],filteredData=[],currentPage=1,rowsPerPage=25;
 
-/* ⚡ LOAD + HARDENING RINGAN */
 async function loadData(){
   try{
-    const res=await fetch("/api/data?action=internal&key=rusun2026",{
-      headers:{"X-Requested-With":"XMLHttpRequest"}
-    });
+    const res=await fetch("/api/data?action=internal&key=rusun2026",{headers:{"X-Requested-With":"XMLHttpRequest"}});
     const json=await res.json();
     if(!json.status) throw "invalid";
 
@@ -174,8 +175,8 @@ function renderTable(){
   const start=(currentPage-1)*rowsPerPage;
   filteredData.slice(start,start+rowsPerPage).forEach(d=>{
     tbody.innerHTML+=`
-    <tr class="border-b border-slate-800">
-      <td class="py-1 uppercase">${d.unit||""}</td>
+    <tr class="border-b border-slate-800 hover:bg-slate-800">
+      <td class="py-1 uppercase text-blue-400 cursor-pointer font-bold" onclick='openDetail(${JSON.stringify(d)})'>${d.unit||""}</td>
       <td>${d.nama||""}</td>
       <td>${badgeStatus(d.kondisiunit)}</td>
       <td>Rp ${Number(d.pembayaran||0).toLocaleString("id-ID")}</td>
@@ -207,10 +208,26 @@ function renderPagination(){
   pagination.appendChild(next);
 }
 
+function openDetail(d){
+  detailBox.innerHTML="";
+  Object.keys(d).forEach(k=>{
+    if(typeof d[k] === "object") return;
+    detailBox.innerHTML+=`
+      <div class="text-slate-400">${k}</div>
+      <div class="font-semibold">${d[k]||"-"}</div>`;
+  });
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeModal(){
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
 searchInput.addEventListener("input",applyFilter);
 statusFilter.addEventListener("change",applyFilter);
 loadData();
 </script>
 </body>
 </html>
-
