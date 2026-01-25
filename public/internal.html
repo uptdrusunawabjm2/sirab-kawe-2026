@@ -10,14 +10,11 @@
 .badge-terisi{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.4)}
 .badge-rusak{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.4)}
 .badge-siap{background:rgba(234,179,8,.15);color:#eab308;border:1px solid rgba(234,179,8,.4)}
-
 .menu-link{display:block;padding:8px 10px;border-radius:8px}
 .menu-link:hover{background:#020617}
-
 .pagination button{padding:6px 12px;margin:0 2px;border-radius:8px;border:1px solid #334155;background:#020617;color:white}
 .pagination button.active{background:#2563eb;border-color:#2563eb}
 .pagination button:disabled{opacity:.4}
-
 #sidebar.collapsed{width:80px}
 #sidebar.collapsed .menu-text{display:none}
 #sidebar.collapsed h1{font-size:0}
@@ -35,84 +32,75 @@ if(sessionStorage.getItem("RUSUN_LOGIN")!=="OK"){
 
 <div class="flex min-h-screen">
 
-<!-- SIDEBAR -->
 <div id="sidebar" class="w-64 bg-slate-900 p-5 flex flex-col transition-all duration-300">
   <h1 class="text-xl font-bold mb-6">RUSUN DASHBOARD</h1>
 
-  <a class="menu-link text-slate-200">
-    <span class="menu-text">Manajemen Penghuni</span>
-  </a>
-
-  <a href="https://kk-terima-2026.vercel.app/" target="_blank" class="menu-link text-slate-300">
-    <span class="menu-text">KK Sewa 2026</span>
-  </a>
-
-  <a href="https://tgk-rusun-2026.vercel.app/" target="_blank" class="menu-link text-slate-300">
-    <span class="menu-text">Tunggakan 2026</span>
-  </a>
+  <a class="menu-link text-slate-200"><span class="menu-text">Manajemen Penghuni</span></a>
+  <a href="https://kk-terima-2026.vercel.app/" target="_blank" class="menu-link text-slate-300"><span class="menu-text">KK Sewa 2026</span></a>
+  <a href="https://tgk-rusun-2026.vercel.app/" target="_blank" class="menu-link text-slate-300"><span class="menu-text">Tunggakan 2026</span></a>
 
   <div class="mt-auto">
     <a onclick="logout()" class="text-red-400 cursor-pointer menu-text">Logout</a>
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="flex-1 p-8">
 
-  <div class="flex items-center gap-4 mb-6">
-    <button onclick="toggleSidebar()" class="bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700">☰</button>
-    <h2 class="text-2xl font-bold">Dashboard Internal</h2>
-  </div>
+<div class="flex items-center gap-4 mb-6">
+  <button onclick="toggleSidebar()" class="bg-slate-800 px-3 py-2 rounded-lg hover:bg-slate-700">☰</button>
+  <h2 class="text-2xl font-bold">Dashboard Internal</h2>
+</div>
 
-  <!-- CARD -->
-  <div class="grid grid-cols-4 gap-4 mb-8">
-    <div class="bg-slate-800 p-4 rounded">Penghuni<br><b id="penghuni">-</b></div>
-    <div class="bg-slate-800 p-4 rounded">Unit Terisi<br><b id="unitTerisi">-</b></div>
-    <div class="bg-slate-800 p-4 rounded">Total Bayar<br><b id="totalBayar">Rp 0</b></div>
-    <div class="bg-slate-800 p-4 rounded">Total Tunggakan<br><b id="totalTunggakan">Rp 0</b></div>
-  </div>
+<div class="grid grid-cols-4 gap-4 mb-8">
+  <div class="bg-slate-800 p-4 rounded">Penghuni<br><b id="penghuni">-</b></div>
+  <div class="bg-slate-800 p-4 rounded">Unit Terisi<br><b id="unitTerisi">-</b></div>
+  <div class="bg-slate-800 p-4 rounded">Total Bayar<br><b id="totalBayar">Rp 0</b></div>
+  <div class="bg-slate-800 p-4 rounded">Total Tunggakan<br><b id="totalTunggakan">Rp 0</b></div>
+</div>
 
-  <!-- TABLE -->
-  <div class="bg-slate-900 rounded p-5">
-    <h3 class="font-bold mb-4">Daftar Penghuni</h3>
+<div class="bg-slate-900 rounded p-5">
+<h3 class="font-bold mb-4">Daftar Penghuni</h3>
 
-    <div class="flex gap-3 mb-4">
-      <input id="searchInput" placeholder="Cari unit / nama..." class="flex-1 p-2 bg-slate-800 rounded">
-      <select id="statusFilter" class="p-2 bg-slate-800 rounded">
-        <option value="">Semua Status</option>
-        <option value="TERISI">Terisi</option>
-        <option value="RUSAK">Rusak</option>
-        <option value="SIAP">Siap Huni</option>
-      </select>
-    </div>
+<div class="flex gap-3 mb-4">
+  <input id="searchInput" placeholder="Cari unit / nama..." class="flex-1 p-2 bg-slate-800 rounded">
+  <select id="statusFilter" class="p-2 bg-slate-800 rounded">
+    <option value="">Semua Status</option>
+    <option value="TERISI">Terisi</option>
+    <option value="RUSAK">Rusak</option>
+    <option value="SIAP">Siap Huni</option>
+  </select>
+</div>
 
-    <table class="w-full text-sm">
-      <thead class="border-b border-slate-700">
-        <tr>
-          <th class="py-2 text-left">Unit</th>
-          <th class="py-2 text-left">Nama</th>
-          <th class="py-2 text-left">Status</th>
-          <th class="py-2 text-left">Total Bayar</th>
-          <th class="py-2 text-left">Total Tunggakan</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+<table class="w-full text-sm">
+<thead class="border-b border-slate-700">
+<tr>
+<th class="py-2 text-left">Unit</th>
+<th class="py-2 text-left">Nama</th>
+<th class="py-2 text-left">Status</th>
+<th class="py-2 text-left">Total Bayar</th>
+<th class="py-2 text-left">Total Tunggakan</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
 
-    <div id="pagination" class="pagination mt-4"></div>
-  </div>
+<div id="pagination" class="pagination mt-4"></div>
+</div>
 </div>
 </div>
 
 <!-- MODAL DETAIL -->
 <div id="modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
-  <div class="bg-slate-900 max-w-4xl w-full rounded-xl p-6 overflow-y-auto max-h-[90vh]">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">Detail Penghuni</h2>
-      <button onclick="closeModal()" class="text-red-400">✖ Tutup</button>
-    </div>
-    <div id="detailBox" class="grid grid-cols-2 gap-3 text-sm"></div>
-  </div>
+<div class="bg-slate-900 max-w-5xl w-full rounded-2xl p-6 overflow-y-auto max-h-[90vh]">
+
+<div class="flex justify-between items-center mb-4">
+<h2 id="judulDetail" class="text-xl font-bold">Detail Penghuni</h2>
+<button onclick="closeModal()" class="text-red-400 font-bold">✖ Tutup</button>
+</div>
+
+<div id="detailBox" class="space-y-6"></div>
+
+</div>
 </div>
 
 <script>
@@ -128,26 +116,20 @@ searchInput=document.getElementById("searchInput"),
 statusFilter=document.getElementById("statusFilter"),
 pagination=document.getElementById("pagination"),
 modal=document.getElementById("modal"),
-detailBox=document.getElementById("detailBox");
+detailBox=document.getElementById("detailBox"),
+judulDetail=document.getElementById("judulDetail");
 
 let allData=[],filteredData=[],currentPage=1,rowsPerPage=25;
 
 async function loadData(){
-  try{
-    const res=await fetch("/api/data?action=internal&key=rusun2026",{headers:{"X-Requested-With":"XMLHttpRequest"}});
-    const json=await res.json();
-    if(!json.status) throw "invalid";
-
-    const sum=json.data.summary,data=json.data.data;
-    penghuni.innerText=sum.penghuni;
-    unitTerisi.innerText=sum.terisi;
-    totalBayar.innerText="Rp "+Number(sum.totalBayar).toLocaleString("id-ID");
-    totalTunggakan.innerText="Rp "+Number(sum.totalTunggakan).toLocaleString("id-ID");
-
-    allData=data;filteredData=data;renderTable();
-  }catch(e){
-    alert("Gagal load data");
-  }
+  const res=await fetch("/api/data?action=internal&key=rusun2026",{headers:{"X-Requested-With":"XMLHttpRequest"}});
+  const json=await res.json();
+  const sum=json.data.summary,data=json.data.data;
+  penghuni.innerText=sum.penghuni;
+  unitTerisi.innerText=sum.terisi;
+  totalBayar.innerText="Rp "+Number(sum.totalBayar).toLocaleString("id-ID");
+  totalTunggakan.innerText="Rp "+Number(sum.totalTunggakan).toLocaleString("id-ID");
+  allData=data;filteredData=data;renderTable();
 }
 
 function badgeStatus(status){
@@ -157,17 +139,6 @@ function badgeStatus(status){
   if(s.includes("rusak")) return `<span class="badge badge-rusak">Rusak</span>`;
   if(s.includes("siap")) return `<span class="badge badge-siap">Siap Huni</span>`;
   return status;
-}
-
-function applyFilter(){
-  const search=searchInput.value.toLowerCase(),status=statusFilter.value;
-  filteredData=allData.filter(d=>{
-    const unit=(d.unit||"").toLowerCase(),
-          nama=(d.nama||"").toLowerCase(),
-          st=(d.kondisiunit||"").toUpperCase();
-    return (unit.includes(search)||nama.includes(search)) && (!status||st.includes(status));
-  });
-  currentPage=1;renderTable();
 }
 
 function renderTable(){
@@ -183,50 +154,60 @@ function renderTable(){
       <td>Rp ${Number(d.tunggakan||0).toLocaleString("id-ID")}</td>
     </tr>`;
   });
-  renderPagination();
 }
 
-function renderPagination(){
-  pagination.innerHTML="";
-  const totalPage=Math.ceil(filteredData.length/rowsPerPage);
+function section(title, rows){
+  return `
+  <div class="bg-slate-800/60 p-4 rounded-xl">
+    <h3 class="font-bold text-blue-400 mb-3">${title}</h3>
+    <div class="grid grid-cols-2 gap-2 text-sm">${rows}</div>
+  </div>`;
+}
 
-  const prev=document.createElement("button");
-  prev.textContent="Prev";prev.disabled=currentPage===1;
-  prev.onclick=()=>{currentPage--;renderTable();};
-  pagination.appendChild(prev);
-
-  for(let i=1;i<=totalPage;i++){
-    const b=document.createElement("button");
-    b.textContent=i;if(i===currentPage)b.classList.add("active");
-    b.onclick=()=>{currentPage=i;renderTable();};
-    pagination.appendChild(b);
-  }
-
-  const next=document.createElement("button");
-  next.textContent="Next";next.disabled=currentPage===totalPage;
-  next.onclick=()=>{currentPage++;renderTable();};
-  pagination.appendChild(next);
+function row(label,val){
+  return `<div class="text-slate-400">${label}</div><div class="font-semibold">${val||"-"}</div>`;
 }
 
 function openDetail(d){
+  judulDetail.innerText="Detail Penghuni - Unit "+d.unit.toUpperCase();
   detailBox.innerHTML="";
-  Object.keys(d).forEach(k=>{
-    if(typeof d[k] === "object") return;
-    detailBox.innerHTML+=`
-      <div class="text-slate-400">${k}</div>
-      <div class="font-semibold">${d[k]||"-"}</div>`;
-  });
+
+  detailBox.innerHTML+=section("IDENTITAS PENGHUNI",
+    row("Nama",d.nama)+row("NIK",d.nik)+row("TTL",d.ttl)+row("Agama",d.agama)+row("Status Kawin",d.statusPerkawinan)
+  );
+
+  detailBox.innerHTML+=section("KONTAK & DOMISILI",
+    row("Alamat",d.alamat)+row("No. HP",d.telp)+row("Email",d.email)+row("Status Tinggal",d.statusTempatTinggal)
+  );
+
+  detailBox.innerHTML+=section("PEKERJAAN & PENGHASILAN",
+    row("Pekerjaan",d.pekerjaan)+row("Penghasilan",d.penghasilan)+
+    row("Pekerjaan Pasangan",d.pekerjaanPasangan)+row("Penghasilan Pasangan",d.penghasilanPasangan)+
+    row("Total Penghasilan",d.totalPenghasilan)
+  );
+
+  detailBox.innerHTML+=section("ANGGOTA KELUARGA",
+    row("Anggota 1",d.anggota1)+"<div></div>"+
+    row("Anggota 2",d.anggota2)+"<div></div>"+
+    row("Anggota 3",d.anggota3)+"<div></div>"+
+    row("Anggota 4",d.anggota4)
+  );
+
+  detailBox.innerHTML+=section("DATA PENJAMIN",
+    row("Nama",d.penjamin)+row("NIK",d.nikPenjamin)+row("Alamat",d.alamatPenjamin)+row("No. HP",d.telpPenjamin)
+  );
+
+  detailBox.innerHTML+=section("STATUS UNIT & KEUANGAN",
+    row("Kondisi Unit",d.kondisiunit)+row("Total Bayar","Rp "+Number(d.pembayaran).toLocaleString("id-ID"))+
+    row("Tunggakan","Rp "+Number(d.tunggakan).toLocaleString("id-ID"))
+  );
+
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
 
-function closeModal(){
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-}
+function closeModal(){ modal.classList.add("hidden"); modal.classList.remove("flex"); }
 
-searchInput.addEventListener("input",applyFilter);
-statusFilter.addEventListener("change",applyFilter);
 loadData();
 </script>
 </body>
