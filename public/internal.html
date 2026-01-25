@@ -110,14 +110,11 @@ unitTerisi=document.getElementById("unitTerisi"),
 totalBayar=document.getElementById("totalBayar"),
 totalTunggakan=document.getElementById("totalTunggakan"),
 tbody=document.getElementById("tbody"),
-searchInput=document.getElementById("searchInput"),
-statusFilter=document.getElementById("statusFilter"),
-pagination=document.getElementById("pagination"),
 modal=document.getElementById("modal"),
 detailBox=document.getElementById("detailBox"),
 judulDetail=document.getElementById("judulDetail");
 
-let allData=[],filteredData=[],currentPage=1,rowsPerPage=25;
+let allData=[];
 
 async function loadData(){
   const res=await fetch("/api/data?action=internal&key=rusun2026",{headers:{"X-Requested-With":"XMLHttpRequest"}});
@@ -127,74 +124,109 @@ async function loadData(){
   unitTerisi.innerText=sum.terisi;
   totalBayar.innerText="Rp "+Number(sum.totalBayar).toLocaleString("id-ID");
   totalTunggakan.innerText="Rp "+Number(sum.totalTunggakan).toLocaleString("id-ID");
-  allData=data;filteredData=data;renderTable();
-}
-
-function badgeStatus(status){
-  if(!status) return "-";
-  const s=status.toLowerCase();
-  if(s.includes("terisi")) return `<span class="badge badge-terisi">Terisi</span>`;
-  if(s.includes("rusak")) return `<span class="badge badge-rusak">Rusak</span>`;
-  if(s.includes("siap")) return `<span class="badge badge-siap">Siap Huni</span>`;
-  return status;
+  allData=data;renderTable();
 }
 
 function renderTable(){
   tbody.innerHTML="";
-  const start=(currentPage-1)*rowsPerPage;
-  filteredData.slice(start,start+rowsPerPage).forEach(d=>{
+  allData.forEach(d=>{
     tbody.innerHTML+=`
     <tr class="border-b border-slate-800 hover:bg-slate-800">
-      <td class="py-1 uppercase text-blue-400 cursor-pointer font-bold" onclick='openDetail(${JSON.stringify(d)})'>${d.unit||""}</td>
-      <td>${d.nama||""}</td>
-      <td>${badgeStatus(d.kondisiunit)}</td>
-      <td>Rp ${Number(d.pembayaran||0).toLocaleString("id-ID")}</td>
-      <td>Rp ${Number(d.tunggakan||0).toLocaleString("id-ID")}</td>
+      <td class="py-1 uppercase text-blue-400 cursor-pointer font-bold" onclick='openDetail(${JSON.stringify(d)})'>${d.unit}</td>
+      <td>${d.nama}</td>
+      <td>${d.kondisiunit}</td>
+      <td>Rp ${Number(d.pembayaran).toLocaleString("id-ID")}</td>
+      <td>Rp ${Number(d.tunggakan).toLocaleString("id-ID")}</td>
     </tr>`;
   });
 }
 
-function info(label,val){
+function section(title,content){
+  return `<div class="bg-slate-800/60 p-4 rounded-xl">
+    <h3 class="font-bold text-blue-400 mb-3">${title}</h3>${content}</div>`;
+}
+
+function gridRow(label,val){
   return `<div class="text-slate-400">${label}</div><div class="font-semibold">${val||"-"}</div>`;
 }
 
-function anggotaCard(title,d){
-  if(!d.nama) return "";
-  return `
-  <div class="bg-slate-800/70 p-4 rounded-xl">
+function anggotaCard(title,o){
+  if(!o.nama) return "";
+  return `<div class="bg-slate-800 p-4 rounded-xl">
     <h4 class="font-bold text-blue-400 mb-2">${title}</h4>
     <div class="grid grid-cols-2 gap-2 text-sm">
-      ${info("Nama",d.nama)}
-      ${info("NIK",d.nik)}
-      ${info("Jenis Kelamin",d.jk)}
-      ${info("TTL",d.ttl)}
-      ${info("Umur",d.umur)}
-      ${info("Status",d.status)}
-      ${info("Disabilitas",d.disabilitas)}
-    </div>
-  </div>`;
+      ${gridRow("Nama",o.nama)}
+      ${gridRow("NIK",o.nik)}
+      ${gridRow("Jenis Kelamin",o.jk)}
+      ${gridRow("TTL",o.ttl)}
+      ${gridRow("Umur",o.umur)}
+      ${gridRow("Status",o.status)}
+      ${gridRow("Disabilitas",o.disabilitas)}
+    </div></div>`;
 }
 
 function openDetail(d){
-  judulDetail.innerText="Detail Penghuni - Unit "+d.unit.toUpperCase();
-  detailBox.innerHTML="";
+  judulDetail.innerText="Detail Penghuni - Unit "+d.unit;
 
-  detailBox.innerHTML+=`
-  <div class="bg-slate-800/60 p-4 rounded-xl">
-    <h3 class="font-bold text-blue-400 mb-3">ANGGOTA KELUARGA</h3>
+  detailBox.innerHTML=
+  section("IDENTITAS PENGHUNI",`
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      ${gridRow("Nama",d.nama)}
+      ${gridRow("NIK",d.nik)}
+      ${gridRow("TTL",d.ttl)}
+      ${gridRow("Agama",d.agama)}
+      ${gridRow("Status Perkawinan",d.statusPerkawinan)}
+    </div>
+  `)+
+  section("KONTAK & DOMISILI",`
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      ${gridRow("Alamat",d.alamat)}
+      ${gridRow("No HP",d.telp)}
+      ${gridRow("Email",d.email)}
+      ${gridRow("Status Tinggal",d.statusTempatTinggal)}
+    </div>
+  `)+
+  section("PEKERJAAN & PENGHASILAN",`
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      ${gridRow("Pekerjaan",d.pekerjaan)}
+      ${gridRow("Penghasilan",d.penghasilan)}
+      ${gridRow("Pekerjaan Pasangan",d.pekerjaanPasangan)}
+      ${gridRow("Penghasilan Pasangan",d.penghasilanPasangan)}
+      ${gridRow("Total Penghasilan",d.totalPenghasilan)}
+    </div>
+  `)+
+  section("ANGGOTA KELUARGA",`
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       ${anggotaCard("Anggota 1",{nama:d.anggota1,nik:d.nik1,jk:d.jk1,ttl:d.ttl1,umur:d.umur1,status:d.status1,disabilitas:d.disabilitas1})}
       ${anggotaCard("Anggota 2",{nama:d.anggota2,nik:d.nik2,jk:d.jk2,ttl:d.ttl2,umur:d.umur2,status:d.status2,disabilitas:d.disabilitas2})}
       ${anggotaCard("Anggota 3",{nama:d.anggota3,nik:d.nik3,jk:d.jk3,ttl:d.ttl3,umur:d.umur3,status:d.status3,disabilitas:d.disabilitas3})}
       ${anggotaCard("Anggota 4",{nama:d.anggota4,nik:d.nik4,jk:d.jk4,ttl:d.ttl4,umur:d.umur4,status:d.status4,disabilitas:d.disabilitas4})}
     </div>
-  </div>`;
+  `)+
+  section("DATA PENJAMIN",`
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      ${gridRow("Nama",d.penjamin)}
+      ${gridRow("NIK",d.nikPenjamin)}
+      ${gridRow("Alamat",d.alamatPenjamin)}
+      ${gridRow("No HP",d.telpPenjamin)}
+    </div>
+  `)+
+  section("STATUS UNIT & KEUANGAN",`
+    <div class="grid grid-cols-2 gap-2 text-sm">
+      ${gridRow("Kondisi Unit",d.kondisiunit)}
+      ${gridRow("Total Bayar","Rp "+Number(d.pembayaran).toLocaleString("id-ID"))}
+      ${gridRow("Tunggakan","Rp "+Number(d.tunggakan).toLocaleString("id-ID"))}
+    </div>
+  `);
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
 
-function closeModal(){ modal.classList.add("hidden"); modal.classList.remove("flex"); }
+function closeModal(){
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
 
 loadData();
 </script>
