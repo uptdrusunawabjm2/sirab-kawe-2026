@@ -232,7 +232,7 @@ function openDetail(d){
   section("KONTAK & DOMISILI",`
     <div class="grid grid-cols-2 gap-2 text-sm">
       ${gridRow("Alamat",d.alamat)}
-      ${gridRow("No HP",d.telp)}
+      ${gridRow("No HP", d.telp || d.notelp || "-")}
       ${gridRow("Email",d.email)}
       ${gridRow("Status Tinggal",d.statusTempatTinggal)}
     </div>
