@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>PDAM - Data Meter</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-950 text-slate-100 p-8">
+
+<h1 class="text-2xl font-bold mb-6 text-slate-100">
+  📊 Data Meter PDAM
+</h1>
+
+<!-- FILTER -->
+<div class="flex flex-wrap gap-3 mb-5">
+  <select id="filterRusun"
+    class="bg-slate-900 border border-slate-700 text-slate-200 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <option value="">Semua Rusunawa</option>
+  </select>
+
+  <input type="month" id="filterBulan"
+    class="bg-slate-900 border border-slate-700 text-slate-200 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+  <button onclick="applyFilter()"
+    class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold transition">
+    Terapkan
+  </button>
+
+  <button onclick="resetFilter()"
+    class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm transition">
+    Reset
+  </button>
+</div>
+
+<!-- TABLE -->
+<div class="overflow-auto bg-slate-900 border border-slate-800 rounded-2xl p-4">
+<table class="w-full text-sm">
+<thead class="border-b border-slate-700 text-slate-300">
+<tr>
+  <th class="py-2 text-left">Rusunawa</th>
+  <th class="py-2 text-left">No Kamar</th>
+  <th class="py-2 text-left">Tanggal</th>
+  <th class="py-2 text-right">Angka Meter</th>
+  <th class="py-2 text-right">Selisih</th>
+  <th class="py-2 text-center">Foto</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+
+<!-- MODAL FOTO -->
+<div id="fotoModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
+  <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full p-4">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-bold text-blue-400">Foto Angka Meter</h3>
+      <button onclick="closeFoto()" class="text-red-400 font-bold hover:text-red-300">✖</button>
+    </div>
+    <div class="flex justify-center">
+      <img id="fotoImg"
+        class="max-h-[70vh] rounded-xl border border-slate-700 shadow">
+    </div>
+  </div>
+</div>
+
+<script>
+let allData = [];
+
+async function loadPDAM(){
+  const r = await fetch("/api/pdam?action=table");
+  const j = await r.json();
+  if(!j.status) return;
+
+  allData = j.data;
+  populateRusunFilter(allData);
+  renderTable(allData);
+}
+
+function populateRusunFilter(data){
+  const rusunSet = new Set(data.map(d=>d.rusunawa));
+  rusunSet.forEach(r=>{
+    const opt = document.createElement("option");
+    opt.value = r;
+    opt.textContent = r;
+    filterRusun.appendChild(opt);
+  });
+}
+
+function applyFilter(){
+  const rusun = filterRusun.value;
+  const bulan = filterBulan.value;
+
+  const filtered = allData.filter(d=>{
+    let ok = true;
+
+    if(rusun && d.rusunawa !== rusun) ok = false;
+
+    if(bulan){
+      const dt = new Date(d.tanggal);
+      const ym = dt.getFullYear() + "-" + String(dt.getMonth()+1).padStart(2,"0");
+      if(ym !== bulan) ok = false;
+    }
+    return ok;
+  });
+
+  renderTable(filtered);
+}
+
+function resetFilter(){
+  filterRusun.value = "";
+  filterBulan.value = "";
+  renderTable(allData);
+}
+
+function renderTable(data){
+  tbody.innerHTML = "";
+  data.forEach(d=>{
+    tbody.innerHTML += `
+    <tr class="border-b border-slate-800 hover:bg-slate-800 transition">
+      <td class="py-2">${d.rusunawa}</td>
+      <td class="py-2 font-bold text-blue-400">${d.no_kamar}</td>
+      <td class="py-2">${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+      <td class="py-2 text-right">${d.angka_meter}</td>
+      <td class="py-2 text-right font-bold text-green-400">${d.selisih_meter}</td>
+      <td class="py-2 text-center">
+        ${d.foto
+          ? `<button onclick="openFoto('${d.foto}')" class="text-blue-400 hover:text-blue-300 underline">lihat</button>`
+          : "-"}
+      </td>
+    </tr>`;
+  });
+}
+
+function openFoto(url){
+  fotoImg.src = url;
+  fotoModal.classList.remove("hidden");
+  fotoModal.classList.add("flex");
+}
+
+function closeFoto(){
+  fotoModal.classList.add("hidden");
+  fotoModal.classList.remove("flex");
+  fotoImg.src = "";
+}
+
+loadPDAM();
+</script>
+
+</body>
+</html>
