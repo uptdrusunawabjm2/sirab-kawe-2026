@@ -72,7 +72,7 @@ async function loadPDAM(){
   const j = await r.json();
   if(!j.status) return;
 
-  allData = j.data;
+  allData = Array.isArray(j.data) ? j.data : (j.data?.data || []);
   populateRusunFilter(allData);
   renderTable(allData);
 }
@@ -149,3 +149,4 @@ loadPDAM();
 
 </body>
 </html>
+
