@@ -83,7 +83,13 @@ async function loadPDAM(){
   const j = await r.json();
   if(!j.status) return;
 
-  allData = j.data || [];
+  /* ===================== PERUBAHAN UTAMA ===================== */
+  // ➜ URUTKAN DATA BERDASARKAN TANGGAL TERBARU
+  allData = (j.data || []).sort(
+    (a,b)=> new Date(b.tanggal) - new Date(a.tanggal)
+  );
+  /* =========================================================== */
+
   filteredData = allData;
 
   populateRusunFilter(allData);
