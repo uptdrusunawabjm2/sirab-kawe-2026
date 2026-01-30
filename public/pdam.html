@@ -6,27 +6,27 @@
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-950 text-slate-100 p-6">
+<body class="bg-slate-950 text-slate-200 p-6">
 
-<h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+<h1 class="text-xl font-semibold mb-5 flex items-center gap-2 text-slate-100">
   📊 <span>Data Meter PDAM</span>
 </h1>
 
 <!-- FILTER -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-  <select id="filterRusun" class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
+  <select id="filterRusun" class="bg-slate-900 border border-slate-800 p-2 rounded-lg text-sm text-slate-300">
     <option value="">Semua Rusunawa</option>
   </select>
 
   <input id="filterKamar" placeholder="Cari No Kamar (ex: C3.01)"
-    class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
+    class="bg-slate-900 border border-slate-800 p-2 rounded-lg text-sm text-slate-300">
 
   <input type="month" id="filterBulan"
-    class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
+    class="bg-slate-900 border border-slate-800 p-2 rounded-lg text-sm text-slate-300">
 
   <div class="flex gap-2">
     <button onclick="applyFilter()"
-      class="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold">
+      class="flex-1 bg-blue-600/80 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-medium">
       Terapkan
     </button>
     <button onclick="resetFilter()"
@@ -37,16 +37,16 @@
 </div>
 
 <!-- TABLE -->
-<div class="overflow-auto bg-slate-900 border border-slate-800 rounded-2xl">
+<div class="overflow-auto bg-slate-900 border border-slate-800 rounded-xl">
 <table class="w-full text-sm">
-<thead class="sticky top-0 bg-slate-800 text-slate-300">
-<tr>
-  <th class="py-3 px-3 text-left">Rusunawa</th>
-  <th class="py-3 px-3 text-left">No Kamar</th>
-  <th class="py-3 px-3 text-left">Tanggal</th>
-  <th class="py-3 px-3 text-right">Angka Meter</th>
-  <th class="py-3 px-3 text-right">Selisih</th>
-  <th class="py-3 px-3 text-center">Foto</th>
+<thead class="sticky top-0 bg-slate-900/95 backdrop-blur text-slate-400">
+<tr class="border-b border-slate-800">
+  <th class="py-3 px-3 font-medium text-left">Rusunawa</th>
+  <th class="py-3 px-3 font-medium text-left">No Kamar</th>
+  <th class="py-3 px-3 font-medium text-left">Tanggal</th>
+  <th class="py-3 px-3 font-medium text-right">Angka</th>
+  <th class="py-3 px-3 font-medium text-right">Selisih</th>
+  <th class="py-3 px-3 font-medium text-center">Foto</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -54,7 +54,7 @@
 </div>
 
 <!-- PAGINATION -->
-<div class="flex justify-between items-center mt-4 text-sm text-slate-300">
+<div class="flex justify-between items-center mt-4 text-xs text-slate-400">
   <div id="info"></div>
   <div class="flex gap-2">
     <button onclick="prevPage()" class="px-3 py-1 bg-slate-800 rounded hover:bg-slate-700">Prev</button>
@@ -68,14 +68,10 @@ let filteredData = [];
 let page = 1;
 const limit = 50;
 
-/* ====== KONVERSI LINK GOOGLE DRIVE ====== */
 function driveToView(url){
   if(!url) return "";
   const m = url.match(/id=([^&]+)/);
-  if(m && m[1]){
-    return "https://drive.google.com/file/d/" + m[1] + "/view";
-  }
-  return url;
+  return m ? "https://drive.google.com/file/d/"+m[1]+"/view" : url;
 }
 
 async function loadPDAM(){
@@ -83,13 +79,9 @@ async function loadPDAM(){
   const j = await r.json();
   if(!j.status) return;
 
-  /* ===================== PERUBAHAN UTAMA ===================== */
-  // ➜ URUTKAN DATA BERDASARKAN TANGGAL TERBARU
   allData = (j.data || []).sort(
     (a,b)=> new Date(b.tanggal) - new Date(a.tanggal)
   );
-  /* =========================================================== */
-
   filteredData = allData;
 
   populateRusunFilter(allData);
@@ -124,36 +116,35 @@ function applyFilter(){
 }
 
 function resetFilter(){
-  filterRusun.value = "";
-  filterKamar.value = "";
-  filterBulan.value = "";
+  filterRusun.value="";
+  filterKamar.value="";
+  filterBulan.value="";
   filteredData = allData;
   page = 1;
   render();
 }
 
 function render(){
-  tbody.innerHTML = "";
+  tbody.innerHTML="";
   const start = (page-1)*limit;
-  const slice = filteredData.slice(start, start+limit);
+  const slice = filteredData.slice(start,start+limit);
 
   slice.forEach((d,i)=>{
-    const zebra = i % 2 ? "bg-slate-900" : "bg-slate-950";
+    const zebra = i%2 ? "bg-slate-900" : "bg-slate-950";
     const fotoLink = d.foto ? driveToView(d.foto) : "";
 
     tbody.innerHTML += `
-    <tr class="${zebra} hover:bg-slate-800 transition">
-      <td class="px-3 py-2">${d.rusunawa}</td>
-      <td class="px-3 py-2 font-semibold text-blue-400">${d.no_kamar}</td>
-      <td class="px-3 py-2">${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
-      <td class="px-3 py-2 text-right">${d.angka_meter}</td>
-      <td class="px-3 py-2 text-right font-bold ${d.selisih_meter>0?'text-green-400':'text-slate-500'}">
+    <tr class="${zebra} hover:bg-slate-800/60 border-b border-slate-800/60">
+      <td class="px-3 py-2.5 text-slate-300">${d.rusunawa}</td>
+      <td class="px-3 py-2.5 font-medium text-blue-400">${d.no_kamar}</td>
+      <td class="px-3 py-2.5 text-slate-400">${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+      <td class="px-3 py-2.5 text-right tracking-wide">${d.angka_meter}</td>
+      <td class="px-3 py-2.5 text-right font-medium ${d.selisih_meter>0?'text-green-400/80':'text-slate-500'}">
         ${d.selisih_meter}
       </td>
-      <td class="px-3 py-2 text-center">
+      <td class="px-3 py-2.5 text-center">
         ${fotoLink
-          ? `<a href="${fotoLink}" target="_blank" rel="noopener"
-               class="text-blue-400 underline font-semibold">lihat</a>`
+          ? `<a href="${fotoLink}" target="_blank" class="text-blue-400/80 hover:text-blue-400 underline">lihat</a>`
           : "-"}
       </td>
     </tr>`;
