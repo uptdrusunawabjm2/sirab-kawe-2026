@@ -6,33 +6,47 @@
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-slate-950 text-slate-100 p-8">
+<body class="bg-slate-950 text-slate-100 p-6">
 
-<h1 class="text-2xl font-bold mb-6">📊 Data Meter PDAM</h1>
+<h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+  📊 <span>Data Meter PDAM</span>
+</h1>
 
 <!-- FILTER -->
-<div class="flex flex-wrap gap-3 mb-5">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
   <select id="filterRusun" class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
     <option value="">Semua Rusunawa</option>
   </select>
 
-  <input type="month" id="filterBulan" class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
+  <input id="filterKamar" placeholder="Cari No Kamar (ex: C3.01)"
+    class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
 
-  <button onclick="applyFilter()" class="bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold">Terapkan</button>
-  <button onclick="resetFilter()" class="bg-slate-800 px-4 py-2 rounded-lg text-sm">Reset</button>
+  <input type="month" id="filterBulan"
+    class="bg-slate-900 border border-slate-700 p-2 rounded-lg text-sm">
+
+  <div class="flex gap-2">
+    <button onclick="applyFilter()"
+      class="flex-1 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold">
+      Terapkan
+    </button>
+    <button onclick="resetFilter()"
+      class="flex-1 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm">
+      Reset
+    </button>
+  </div>
 </div>
 
 <!-- TABLE -->
-<div class="overflow-auto bg-slate-900 border border-slate-800 rounded-2xl p-4">
+<div class="overflow-auto bg-slate-900 border border-slate-800 rounded-2xl">
 <table class="w-full text-sm">
-<thead class="border-b border-slate-700 text-slate-300">
+<thead class="sticky top-0 bg-slate-800 text-slate-300">
 <tr>
-  <th>Rusunawa</th>
-  <th>No Kamar</th>
-  <th>Tanggal</th>
-  <th class="text-right">Angka Meter</th>
-  <th class="text-right">Selisih</th>
-  <th class="text-center">Foto</th>
+  <th class="py-3 px-3 text-left">Rusunawa</th>
+  <th class="py-3 px-3 text-left">No Kamar</th>
+  <th class="py-3 px-3 text-left">Tanggal</th>
+  <th class="py-3 px-3 text-right">Angka Meter</th>
+  <th class="py-3 px-3 text-right">Selisih</th>
+  <th class="py-3 px-3 text-center">Foto</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -40,19 +54,22 @@
 </div>
 
 <!-- PAGINATION -->
-<div class="flex justify-between items-center mt-4 text-sm">
+<div class="flex justify-between items-center mt-4 text-sm text-slate-300">
   <div id="info"></div>
   <div class="flex gap-2">
-    <button onclick="prevPage()" class="px-3 py-1 bg-slate-800 rounded">Prev</button>
-    <button onclick="nextPage()" class="px-3 py-1 bg-slate-800 rounded">Next</button>
+    <button onclick="prevPage()" class="px-3 py-1 bg-slate-800 rounded hover:bg-slate-700">Prev</button>
+    <button onclick="nextPage()" class="px-3 py-1 bg-slate-800 rounded hover:bg-slate-700">Next</button>
   </div>
 </div>
 
 <!-- MODAL FOTO -->
 <div id="fotoModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50">
-  <div class="bg-slate-900 rounded-xl p-4">
-    <button onclick="closeFoto()" class="text-red-400 mb-2">✖ Tutup</button>
-    <img id="fotoImg" class="max-h-[80vh] rounded">
+  <div class="bg-slate-900 rounded-xl p-4 max-w-3xl w-full">
+    <div class="flex justify-between mb-2">
+      <span class="font-semibold text-blue-400">Foto Angka Meter</span>
+      <button onclick="closeFoto()" class="text-red-400 font-bold">✖</button>
+    </div>
+    <img id="fotoImg" class="max-h-[75vh] mx-auto rounded-xl">
   </div>
 </div>
 
@@ -82,16 +99,20 @@ function populateRusunFilter(data){
 }
 
 function applyFilter(){
-  const r = filterRusun.value;
-  const b = filterBulan.value;
+  const rusun = filterRusun.value;
+  const kamar = filterKamar.value.toLowerCase();
+  const bulan = filterBulan.value;
 
   filteredData = allData.filter(d=>{
     let ok = true;
-    if(r && d.rusunawa !== r) ok = false;
-    if(b){
+
+    if(rusun && d.rusunawa !== rusun) ok = false;
+    if(kamar && !String(d.no_kamar).toLowerCase().includes(kamar)) ok = false;
+
+    if(bulan){
       const dt = new Date(d.tanggal);
       const ym = dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0");
-      if(ym !== b) ok = false;
+      if(ym !== bulan) ok = false;
     }
     return ok;
   });
@@ -101,28 +122,32 @@ function applyFilter(){
 }
 
 function resetFilter(){
-  filterRusun.value="";
-  filterBulan.value="";
+  filterRusun.value = "";
+  filterKamar.value = "";
+  filterBulan.value = "";
   filteredData = allData;
   page = 1;
   render();
 }
 
 function render(){
-  tbody.innerHTML="";
+  tbody.innerHTML = "";
   const start = (page-1)*limit;
   const slice = filteredData.slice(start, start+limit);
 
-  slice.forEach(d=>{
+  slice.forEach((d,i)=>{
+    const zebra = i % 2 ? "bg-slate-900" : "bg-slate-950";
     tbody.innerHTML += `
-    <tr class="border-b border-slate-800">
-      <td>${d.rusunawa}</td>
-      <td class="font-bold text-blue-400">${d.no_kamar}</td>
-      <td>${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
-      <td class="text-right">${d.angka_meter}</td>
-      <td class="text-right text-green-400 font-bold">${d.selisih_meter}</td>
-      <td class="text-center">
-        ${d.foto ? `<button onclick="openFoto('${d.foto}')" class="underline text-blue-400">lihat</button>`:"-"}
+    <tr class="${zebra} hover:bg-slate-800 transition">
+      <td class="px-3 py-2">${d.rusunawa}</td>
+      <td class="px-3 py-2 font-semibold text-blue-400">${d.no_kamar}</td>
+      <td class="px-3 py-2">${new Date(d.tanggal).toLocaleDateString("id-ID")}</td>
+      <td class="px-3 py-2 text-right">${d.angka_meter}</td>
+      <td class="px-3 py-2 text-right font-bold ${d.selisih_meter>0?'text-green-400':'text-slate-500'}">
+        ${d.selisih_meter}
+      </td>
+      <td class="px-3 py-2 text-center">
+        ${d.foto ? `<button onclick="openFoto('${d.foto}')" class="text-blue-400 underline">lihat</button>`:"-"}
       </td>
     </tr>`;
   });
@@ -130,21 +155,17 @@ function render(){
   info.innerText = `Menampilkan ${start+1}-${Math.min(start+limit, filteredData.length)} dari ${filteredData.length}`;
 }
 
-function nextPage(){
-  if(page*limit < filteredData.length){ page++; render(); }
-}
-function prevPage(){
-  if(page>1){ page--; render(); }
-}
+function nextPage(){ if(page*limit < filteredData.length){ page++; render(); } }
+function prevPage(){ if(page>1){ page--; render(); } }
 
 function openFoto(u){
-  fotoImg.src=u;
+  fotoImg.src = u;
   fotoModal.classList.remove("hidden");
   fotoModal.classList.add("flex");
 }
 function closeFoto(){
   fotoModal.classList.add("hidden");
-  fotoImg.src="";
+  fotoImg.src = "";
 }
 
 loadPDAM();
