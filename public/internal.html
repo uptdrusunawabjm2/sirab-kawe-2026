@@ -270,6 +270,27 @@ function openDetail(d){
       ${gridRow("Total Bayar","Rp "+Number(d.pembayaran).toLocaleString("id-ID"))}
       ${gridRow("Tunggakan","Rp "+Number(d.tunggakan).toLocaleString("id-ID"))}
     </div>
+  `)+
+    section("DATA ADMINISTRASI",`
+  <div class="grid grid-cols-2 gap-2 text-sm">
+    ${gridRow("No Daftar Formulir",d.no_daftar_formulir)}
+    ${gridRow("Tanggal Daftar",d.tgl_daftar)}
+    ${gridRow("No Persetujuan",d.no_setuju_calon_penghuni)}
+    ${gridRow("Tanggal Persetujuan",d.tgl_setuju_calon_penghuni)}
+    ${gridRow("No Panggilan",d.no_panggilan_calon_penghuni)}
+    ${gridRow("Tanggal Panggilan",d.tgl_panggilan_calon_penghuni)}
+    ${gridRow("No Penetapan",d.no_penetapan_calon_penghuni)}
+    ${gridRow("Tanggal Penetapan",d.tgl_penetapan_calon_penghuni)}
+    ${gridRow("No Perjanjian",d.no_perjanjian_penghuni)}
+    ${gridRow("Mulai Perjanjian",d.tgl_perjanjian_mulai_penghuni)}
+    ${gridRow("Akhir Perjanjian",d.tgl_perjanjian_akhir_penghuni)}
+    ${gridRow("No BAPS",d.no_baps_penghuni)}
+    ${gridRow("Tanggal BAPS",d.tgl_baps_penghuni)}
+    ${gridRow("No BAST",d.no_bast_penghuni)}
+    ${gridRow("Tanggal BAST",d.tgl_bast_penghuni)}
+    ${gridRow("No Izin",d.no_izin_penghuni)}
+    ${gridRow("Tanggal Izin",d.tgl_izin_penghuni)}
+  </div>
   `);
 
   modal.classList.remove("hidden");
@@ -288,6 +309,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
