@@ -311,7 +311,57 @@ loadData();
 </body>
 </html>
 
+<!-- === NON-DESTRUCTIVE ENHANCEMENT: KONTRAK BADGE & DATE FORMAT === -->
+<script>
+(function(){
+  function fmtTanggal(val){
+    if(!val) return "-";
+    const d = new Date(val);
+    if(isNaN(d)) return val;
+    return d.toLocaleDateString("id-ID",{day:"2-digit",month:"2-digit",year:"numeric"});
+  }
+  function kontrakBadge(val){
+    if(!val) return "";
+    const end = new Date(val);
+    if(isNaN(end)) return "";
+    const now = new Date();
+    const diff = Math.ceil((end - now)/(1000*60*60*24));
+    if(diff < 0) return '<span class="badge badge-danger">HABIS</span>';
+    if(diff <= 30) return '<span class="badge badge-warn">AKAN HABIS ('+diff+' hari)</span>';
+    return '';
+  }
 
+  function enhanceModal(){
+    const modal = document.getElementById('modal');
+    if(!modal || modal.classList.contains('hidden')) return;
 
+    // Find rows where label text is "Akhir Perjanjian"
+    const rows = modal.querySelectorAll('div');
+    for(let i=0;i<rows.length;i++){
+      const el = rows[i];
+      if(el && el.textContent && el.textContent.trim() === 'Akhir Perjanjian'){
+        const valueEl = el.nextElementSibling;
+        if(!valueEl) continue;
+        const raw = valueEl.textContent.trim();
+        // Try to parse date-like strings
+        const d = new Date(raw);
+        if(!isNaN(d)){
+          const dateOnly = fmtTanggal(d.toISOString());
+          const badge = kontrakBadge(d.toISOString());
+          valueEl.innerHTML = '<span>'+dateOnly+'</span> ' + badge;
+        }
+      }
+    }
+  }
 
+  // Observe modal visibility changes
+  const obs = new MutationObserver(enhanceModal);
+  const target = document.getElementById('modal') || document.body;
+  obs.observe(target, { attributes:true, subtree:true, attributeFilter:['class'] });
 
+  // Initial attempt
+  document.addEventListener('click', function(){
+    setTimeout(enhanceModal, 0);
+  });
+})();
+</script>
