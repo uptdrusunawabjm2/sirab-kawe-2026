@@ -267,14 +267,16 @@ function openDetail(d){
   `)+
   section("DATA ADMINISTRASI",`
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-      <div class="bg-slate-800 p-4 rounded-xl">
+
+      <div class="bg-slate-800 p-4 rounded-xl order-4 md:order-1">
         <h4 class="font-bold text-blue-400 mb-3">Pendaftaran</h4>
         <div class="grid grid-cols-2 gap-2">
           ${gridRow("No Daftar Formulir",d.no_daftar_formulir)}
           ${gridRow("Tanggal Daftar",fmtTanggal(d.tgl_daftar))}
         </div>
       </div>
-      <div class="bg-slate-800 p-4 rounded-xl">
+
+      <div class="bg-slate-800 p-4 rounded-xl order-3 md:order-2">
         <h4 class="font-bold text-blue-400 mb-3">Pengumuman</h4>
         <div class="grid grid-cols-2 gap-2">
           ${gridRow("No Persetujuan",d.no_setuju_calon_penghuni)}
@@ -283,14 +285,16 @@ function openDetail(d){
           ${gridRow("Tanggal Panggilan",fmtTanggal(d.tgl_panggilan_calon_penghuni))}
         </div>
       </div>
-      <div class="bg-slate-800 p-4 rounded-xl">
+
+      <div class="bg-slate-800 p-4 rounded-xl order-2 md:order-3">
         <h4 class="font-bold text-blue-400 mb-3">Penetapan</h4>
         <div class="grid grid-cols-2 gap-2">
           ${gridRow("No Penetapan",d.no_penetapan_calon_penghuni)}
           ${gridRow("Tanggal Penetapan",fmtTanggal(d.tgl_penetapan_calon_penghuni))}
         </div>
       </div>
-      <div class="bg-slate-800 p-4 rounded-xl">
+
+      <div class="bg-slate-800 p-4 rounded-xl order-1 md:order-4">
         <h4 class="font-bold text-blue-400 mb-3">Perjanjian</h4>
         <div class="grid grid-cols-2 gap-2">
           ${gridRow("No Perjanjian",d.no_perjanjian_penghuni)}
@@ -302,6 +306,7 @@ function openDetail(d){
           </div>
         </div>
       </div>
+
     </div>
   `)+
   section("ANGGOTA KELUARGA",`
@@ -326,7 +331,7 @@ function openDetail(d){
       ${gridRow("Total Bayar","Rp "+Number(d.pembayaran).toLocaleString("id-ID"))}
       ${gridRow("Tunggakan","Rp "+Number(d.tunggakan).toLocaleString("id-ID"))}
     </div>
-    `)+
+  `)+
   section("STATUS UNIT",`
     <div class="grid grid-cols-2 gap-2 text-sm">
       ${gridRow("Kondisi Unit",d.kondisiunit)}
@@ -349,6 +354,3 @@ loadData();
 </script>
 </body>
 </html>
-
-
-
