@@ -25,6 +25,36 @@
 .tabular-nums{font-variant-numeric:tabular-nums}
 /* ============================================================= */
 
+
+/* ===== UI FIX v2 (STILL UI-ONLY, NO STRUCTURE / NO LOGIC CHANGE) ===== */
+
+/* Pastikan grid label-nilai benar-benar rapi */
+#detailBox .grid.grid-cols-2{
+  grid-template-columns:160px 1fr !important;
+  column-gap:12px;
+  row-gap:8px;
+}
+
+/* Label */
+#detailBox .grid.grid-cols-2 > div:nth-child(odd){
+  color:#94a3b8;
+  white-space:nowrap;
+  font-size:13px;
+}
+
+/* Value */
+#detailBox .grid.grid-cols-2 > div:nth-child(even){
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Card sedikit lebih soft */
+#detailBox > div{
+  background:rgba(15,23,42,.85);
+}
+
+/* ================================================================ */
+
 </style>
 </head>
 
