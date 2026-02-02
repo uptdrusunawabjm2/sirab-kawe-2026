@@ -385,10 +385,10 @@ function openDetail(d){
   section("PEKERJAAN & PENGHASILAN",`
     <div class="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-x-4 gap-y-2">
       ${gridRow("Pekerjaan",d.pekerjaan)}
-      ${gridRow("Penghasilan",d.penghasilan)}
-      ${gridRow("Pekerjaan Pasangan",d.pekerjaanPasangan)}
-      ${gridRow("Penghasilan Pasangan",d.penghasilanPasangan)}
-      ${gridRow("Total Penghasilan",d.totalPenghasilan)}
+      ${gridRow("Penghasilan","Rp "+Number(d.penghasilan).toLocaleString("id-ID"))}
+      ${gridRow("Pekerjaan Pasangan","Rp "+Number(d.pekerjaanPasangan).toLocaleString("id-ID"))}
+      ${gridRow("Penghasilan Pasangan","Rp "+Number(d.penghasilanPasangan).toLocaleString("id-ID"))}
+      ${gridRow("Total Penghasilan","Rp "+Number(d.totalPenghasilan).toLocaleString("id-ID"))}
     </div>
   `)+
   section("DATA ADMINISTRASI",`
@@ -500,6 +500,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
