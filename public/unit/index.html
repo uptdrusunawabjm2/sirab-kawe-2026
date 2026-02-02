@@ -2,187 +2,152 @@
 <html lang="id" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Informasi Unit Penghuni</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            base: '#020617'
-          }
-        }
-      }
-    }
-  </script>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
-  <main class="max-w-4xl mx-auto px-5 py-12">
+<div class="max-w-4xl mx-auto px-6 py-10 space-y-8">
 
-    <!-- HEADER -->
-    <header class="text-center mb-10">
-      <h1 id="rusunName" class="text-xl font-semibold text-slate-300"></h1>
-      <h2 class="text-3xl font-bold tracking-tight mt-1">
-        Rusunawa Kota Banjarmasin
-      </h2>
-      <p class="text-slate-400 mt-1 text-sm">
-        Informasi Unit Penghuni <span class="opacity-70">(Read Only)</span>
-      </p>
-    </header>
+  <!-- HEADER -->
+  <div class="text-center">
+    <h1 class="text-2xl font-bold">Rusunawa Kota Banjarmasin</h1>
+    <p class="text-slate-400 text-sm mt-1">
+      Informasi Unit Penghuni (Read Only)
+    </p>
+  </div>
 
-    <!-- ALERT -->
-    <div id="alert"
-      class="hidden mb-8 rounded-xl border border-red-800/40 bg-red-950/60 px-5 py-4 text-center text-red-300">
-    </div>
+  <!-- ALERT -->
+  <div id="alert" class="hidden rounded-xl p-4 text-center text-sm"></div>
 
-    <!-- CONTENT -->
-    <section id="content" class="hidden space-y-6">
+  <!-- CONTENT -->
+  <div id="content" class="hidden space-y-6"></div>
 
-      <!-- UNIT CARD -->
-      <div class="rounded-2xl bg-slate-900/70 backdrop-blur border border-slate-800 shadow-lg p-6">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 id="unitTitle" class="text-xl font-semibold tracking-tight"></h2>
-            <p class="text-slate-400 text-sm mt-1">Unit Hunian Aktif</p>
-          </div>
-          <span id="kondisiBadge"
-            class="inline-flex items-center justify-center rounded-full px-4 py-1 text-sm font-medium">
-          </span>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div class="rounded-lg bg-slate-950/70 border border-slate-800 p-4">
-            <div class="text-slate-400 mb-1">Nama Penghuni</div>
-            <div id="namaPenghuni" class="font-medium"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- RIWAYAT NAMA -->
-      <div class="rounded-2xl bg-slate-900/70 backdrop-blur border border-slate-800 shadow-lg p-6">
-        <h3 class="text-lg font-semibold mb-4">Riwayat Nama Penghuni</h3>
-        <ul id="riwayatNama"
-          class="space-y-2 text-sm list-disc list-inside text-slate-200">
-        </ul>
-      </div>
-
-      <!-- RIWAYAT PERJANJIAN -->
-      <div class="rounded-2xl bg-slate-900/70 backdrop-blur border border-slate-800 shadow-lg p-6">
-        <h3 class="text-lg font-semibold mb-4">Riwayat Perjanjian</h3>
-        <div id="riwayatPerjanjian" class="space-y-3 text-sm"></div>
-      </div>
-
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="mt-12 text-center text-xs text-slate-500">
-      Data ini bersifat informatif dan tidak dapat diubah.
-    </footer>
-
-  </main>
+  <p class="text-center text-xs text-slate-500 pt-6">
+    Data ini bersifat informatif dan tidak dapat diubah.
+  </p>
+</div>
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbzjABRVgRaoMj3Y1gCU_DRJpnZIvkGwxRRxmPW6buV1POsQ87GQCLAeEBG5j9jJZux7iQ/exec";
 
 const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
+const token  = params.get("token");
 
 const alertBox = document.getElementById("alert");
 const content  = document.getElementById("content");
 
-const rusunName = document.getElementById("rusunName");
-const unitTitle = document.getElementById("unitTitle");
-const namaPenghuni = document.getElementById("namaPenghuni");
-const kondisiBadge = document.getElementById("kondisiBadge");
-
-const riwayatNama = document.getElementById("riwayatNama");
-const riwayatPerjanjian = document.getElementById("riwayatPerjanjian");
-
 function showError(msg){
+  alertBox.className =
+    "rounded-xl p-4 text-center bg-red-900/40 text-red-300";
   alertBox.textContent = msg;
   alertBox.classList.remove("hidden");
 }
 
-function getRusunName(unit){
-  const u = unit.toUpperCase();
-  if(u.startsWith("GM")) return "Rusunawa Ganda Maghfirah";
-  if(u.startsWith("TK")) return "Rusunawa Teluk Kelayan";
+function rusunNameFromUnit(unit){
+  if(unit.startsWith("GM")) return "Rusunawa Ganda Maghfirah";
+  if(unit.startsWith("TK")) return "Rusunawa Teluk Kelayan";
   return "Rusunawa";
+}
+
+function statusBadge(kondisi){
+  if(String(kondisi).toLowerCase().includes("terisi"))
+    return `<span class="px-3 py-1 text-xs rounded-full bg-blue-600/30 text-blue-300">Terisi</span>`;
+  return `<span class="px-3 py-1 text-xs rounded-full bg-slate-600/30 text-slate-300">-</span>`;
 }
 
 if(!token){
   showError("Token tidak ditemukan");
 } else {
-  fetch(`${API}?action=unit&token=${token}`)
-    .then(r => r.json())
-    .then(res => {
-      if(!res.status){
-        showError(res.message || "Token tidak valid / nonaktif");
-        return;
-      }
 
-      const d = res.data;
-      const unitUpper = d.unit.toUpperCase();
+fetch(`${API}?action=unit&token=${token}`)
+.then(r => r.json())
+.then(res => {
 
-      rusunName.textContent = getRusunName(unitUpper);
-      unitTitle.textContent = `UNIT ${unitUpper}`;
-      namaPenghuni.textContent = d.nama || "-";
+  if(!res.status){
+    showError(res.message || "Token tidak valid / nonaktif");
+    return;
+  }
 
-      const kondisi = (d.kondisiunit || "").toLowerCase();
-      let badgeClass = "bg-slate-700 text-slate-200";
-      let badgeText  = d.kondisiunit || "-";
+  const d = res.data;
+  const UNIT = String(d.unit || "").toUpperCase();
+  const RUSUN = rusunNameFromUnit(UNIT);
 
-      if(kondisi.includes("terisi")){
-        badgeClass = "bg-blue-900/60 text-blue-300";
-      } else if(kondisi.includes("siap")){
-        badgeClass = "bg-emerald-900/60 text-emerald-300";
-      } else if(kondisi.includes("rusak")){
-        badgeClass = "bg-red-900/60 text-red-300";
-      }
+  /* ===== RIWAYAT PERJANJIAN ===== */
+  let perjanjianHTML = "";
+  if(Array.isArray(d.riwayatPerjanjian) && d.riwayatPerjanjian.length){
+    perjanjianHTML = d.riwayatPerjanjian.map(p => `
+      <div class="rounded-lg border border-slate-800 p-4 bg-slate-900/40">
+        <div class="flex justify-between items-start gap-4">
+          <div>
+            <p class="font-medium">${p.jenis || "Perjanjian"}</p>
+            <p class="text-xs text-slate-400 mt-1 break-all">
+              ${p.no_perjanjian_penghuni || "-"}
+            </p>
+            <p class="text-xs text-slate-400 mt-1">
+              ${p.tgl_perjanjian_mulai_penghuni || "-"}
+              →
+              ${p.tgl_perjanjian_akhir_penghuni || "-"}
+            </p>
+          </div>
+          <span class="px-3 py-1 text-xs rounded-full
+            ${String(p.status).toLowerCase().includes("aktif")
+              ? "bg-green-600/30 text-green-300"
+              : "bg-slate-600/30 text-slate-300"}">
+            ${p.status || "-"}
+          </span>
+        </div>
+      </div>
+    `).join("");
+  } else {
+    perjanjianHTML = `
+      <p class="text-sm text-slate-400">
+        Tidak ada riwayat perjanjian.
+      </p>`;
+  }
 
-      kondisiBadge.className =
-        `rounded-full px-4 py-1 text-sm font-medium ${badgeClass}`;
-      kondisiBadge.textContent = badgeText;
+  /* ===== RENDER ===== */
+  content.innerHTML = `
 
-      /* RIWAYAT NAMA */
-      riwayatNama.innerHTML = "";
-      if(d.riwayatNamaPenghuni?.length){
-        d.riwayatNamaPenghuni.forEach(n=>{
-          const li = document.createElement("li");
-          li.textContent = n;
-          riwayatNama.appendChild(li);
-        });
-      } else {
-        riwayatNama.innerHTML = "<li>-</li>";
-      }
+  <!-- UNIT + RUSUN -->
+  <div class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900/60 p-6 border border-slate-800">
+    <p class="text-sm text-slate-400">${RUSUN}</p>
 
-      /* RIWAYAT PERJANJIAN */
-      riwayatPerjanjian.innerHTML = "";
-      if(d.riwayatPerjanjian?.length){
-        d.riwayatPerjanjian.forEach(p=>{
-          const div = document.createElement("div");
-          div.className = "rounded-lg border border-slate-800 bg-slate-950/60 p-4";
-          div.innerHTML = `
-            <div class="font-medium">${p.no_perjanjian || "-"}</div>
-            <div class="text-slate-400 text-xs mt-1">
-              ${p.tgl_mulai || p.tanggal || "-"} → ${p.tgl_akhir || "-"}
-            </div>
-          `;
-          riwayatPerjanjian.appendChild(div);
-        });
-      } else {
-        riwayatPerjanjian.innerHTML =
-          `<div class="text-slate-400 text-sm">Tidak ada riwayat perjanjian</div>`;
-      }
+    <div class="flex justify-between items-start mt-1">
+      <h2 class="text-xl font-semibold">UNIT ${UNIT}</h2>
+      ${statusBadge(d.kondisiunit)}
+    </div>
 
-      content.classList.remove("hidden");
-    })
-    .catch(()=>{
-      showError("Koneksi gagal ke server");
-    });
+    <p class="text-xs text-slate-500 mt-1">Unit Hunian Aktif</p>
+
+    <div class="mt-4 rounded-xl bg-slate-950 p-4 border border-slate-800">
+      <p class="text-xs text-slate-400">Nama Penghuni</p>
+      <p class="font-medium mt-1">${d.nama || "-"}</p>
+    </div>
+  </div>
+
+  <!-- RIWAYAT NAMA -->
+  <div class="rounded-2xl bg-slate-900/60 p-6 border border-slate-800">
+    <h3 class="font-semibold mb-3">Riwayat Nama Penghuni</h3>
+    <ul class="list-disc ml-5 space-y-1 text-sm">
+      ${(d.riwayatNamaPenghuni || []).map(n => `<li>${n}</li>`).join("") || "<li>-</li>"}
+    </ul>
+  </div>
+
+  <!-- RIWAYAT PERJANJIAN -->
+  <div class="rounded-2xl bg-slate-900/60 p-6 border border-slate-800 space-y-3">
+    <h3 class="font-semibold">Riwayat Perjanjian</h3>
+    ${perjanjianHTML}
+  </div>
+  `;
+
+  content.classList.remove("hidden");
+})
+.catch(() => {
+  showError("Koneksi gagal ke server");
+});
 }
 </script>
 
