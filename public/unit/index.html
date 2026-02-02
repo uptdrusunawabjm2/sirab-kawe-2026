@@ -119,9 +119,6 @@ fetch(`${API}?action=unit&token=${token}`)
       <h2 class="text-xl font-semibold">UNIT ${UNIT}</h2>
       ${statusBadge(d.kondisiunit)}
     </div>
-
-    <p class="text-xs text-slate-500 mt-1">Unit Hunian Aktif</p>
-
     <div class="mt-4 rounded-xl bg-slate-950 p-4 border border-slate-800">
       <p class="text-xs text-slate-400">Nama Penghuni</p>
       <p class="font-medium mt-1">${d.nama || "-"}</p>
@@ -153,3 +150,4 @@ fetch(`${API}?action=unit&token=${token}`)
 
 </body>
 </html>
+
