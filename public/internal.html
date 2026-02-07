@@ -507,6 +507,10 @@ function openDetail(d){
       ${gridRow("Total Bayar","Rp "+Number(d.pembayaran).toLocaleString("id-ID"))}
       ${gridRow("Tunggakan","Rp "+Number(d.tunggakan).toLocaleString("id-ID"))}
     </div>
+    <div class="mt-4">
+    <div class="text-slate-400 text-sm mb-2">Riwayat Pembayaran</div>
+      ${renderRiwayatPembayaran(d.riwayatPembayaran)}
+    </div>
   `)+
   section("STATUS UNIT",`
     <div class="grid grid-cols-1 md:grid-cols-[160px_1fr] gap-x-4 gap-y-2">
@@ -536,6 +540,7 @@ loadData();
 </script>
 </body>
 </html>
+
 
 
 
