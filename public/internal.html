@@ -350,7 +350,7 @@ function renderRiwayatPenghuniDetailTable(list){
 
 function renderRiwayatTunggakan(list){
   if(!Array.isArray(list) || list.length===0){
-    return `<div class="text-slate-400 text-sm italic">Belum ada riwayat detail penghuni</div>`;
+    return `<div class="text-slate-400 text-sm italic">Belum ada riwayat tunggakan</div>`;
   }
   return `
   <div class="overflow-x-auto border border-slate-800 rounded-lg">
@@ -533,7 +533,7 @@ function openDetail(d){
       ${renderRiwayatPembayaran(d.riwayatPembayaran)}
     </div>
         <div class="mt-4">
-      <div class="text-slate-400 text-sm mb-2">Detail Riwayat Penghuni</div>
+      <div class="text-slate-400 text-sm mb-2">Riwayat Tunggakan</div>
       ${renderRiwayatTunggakan(d.renderRiwayatTunggakan)}
     </div>
   `)+
@@ -563,3 +563,4 @@ loadData();
 </script>
 </body>
 </html>
+
