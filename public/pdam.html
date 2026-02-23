@@ -23,6 +23,56 @@
 #filterKamar{
   text-transform: uppercase;
 }
+
+/* ================================
+   MODE TABEL PADAT KHUSUS MOBILE
+   Tidak mengubah struktur HTML
+================================ */
+@media (max-width: 768px){
+
+  /* Font lebih kecil */
+  table{
+    font-size:12px !important;
+  }
+
+  /* Tinggi baris dipadatkan */
+  th, td{
+    padding:6px 8px !important;
+  }
+
+  /* Header lebih rapat */
+  thead th{
+    padding:7px 8px !important;
+    font-size:11px !important;
+  }
+
+  /* Hilangkan whitespace agar tidak melebar */
+  td, th{
+    white-space:nowrap;
+  }
+
+  /* Kolom foto diperkecil */
+  td:last-child, th:last-child{
+    width:50px;
+  }
+
+  /* Link foto diperkecil */
+  td a{
+    padding:2px 4px !important;
+    font-size:11px !important;
+  }
+
+  /* Info pagination lebih kecil */
+  #info{
+    font-size:10px;
+  }
+
+  /* Tombol pagination lebih kecil */
+  .flex.gap-2 button{
+    padding:3px 6px !important;
+    font-size:11px !important;
+  }
+}
 </style>
 </head>
 
