@@ -620,30 +620,113 @@ function openDetail(d){
 }
 
 function exportPDF(){
-  const element = document.getElementById("detailBox");
 
-  // Aktifkan mode PDF
-  element.classList.add("pdf-mode");
+  const unit = judulDetail.innerText.replace("Detail Penghuni - Unit ","");
+  const d = allData.find(x => x.unit === unit);
+  if(!d) return;
 
-  const opt = {
-    margin: 12,
-    filename: judulDetail.innerText.replace(/\s+/g,"_") + ".pdf",
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2,
-      backgroundColor: "#ffffff"
-    },
-    jsPDF: { 
-      unit: 'mm', 
-      format: 'a4', 
-      orientation: 'portrait' 
-    }
-  };
+  const cetakTanggal = new Date().toLocaleDateString("id-ID");
 
-  html2pdf().set(opt).from(element).save().then(()=>{
-    // Kembalikan ke mode normal
-    element.classList.remove("pdf-mode");
-  });
+  const el = document.createElement("div");
+  el.style.fontFamily = "Arial";
+  el.style.fontSize = "11px";
+  el.style.color = "#000";
+  el.style.padding = "20px";
+
+  el.innerHTML = `
+  <div style="text-align:center;font-size:18px;font-weight:bold;margin-bottom:15px;">
+    DATA PENGHUNI
+  </div>
+
+  <!-- BLOK RUSUN -->
+  <table width="100%" border="1" cellspacing="0" cellpadding="5" style="margin-bottom:8px;">
+    <tr><td width="30%">Rusunawa</td><td>${d.rusunawa||'-'}</td></tr>
+    <tr><td>Type</td><td>${d.type||'-'}</td></tr>
+    <tr><td>Blok</td><td>${(d.unit||'').split('-')[1]?.charAt(0)||'-'}</td></tr>
+    <tr><td>Lantai</td><td>${(d.unit||'').split('.')[0]?.slice(-1)||'-'}</td></tr>
+    <tr><td>No Sarusunawa</td><td>${d.unit||'-'}</td></tr>
+  </table>
+
+  <!-- TARIF -->
+  <table width="100%" border="1" cellspacing="0" cellpadding="5" style="margin-bottom:8px;">
+    <tr><td width="40%">Tarif sewa per bulan</td><td>Rp ${Number(d.tarif||0).toLocaleString("id-ID")}</td></tr>
+    <tr><td>Uang Jaminan</td><td>Rp ${Number(d.jaminan||0).toLocaleString("id-ID")}</td></tr>
+  </table>
+
+  <!-- ADMINISTRASI -->
+  <table width="100%" border="1" cellspacing="0" cellpadding="5" style="margin-bottom:8px;">
+    <tr><td>Pendaftaran</td><td>${d.no_daftar_formulir||'-'}</td></tr>
+    <tr><td>Penetapan</td><td>${d.no_penetapan_calon_penghuni||'-'}</td></tr>
+    <tr><td>Surat Izin Tinggal</td><td>${d.no_izin_penghuni||'-'}</td></tr>
+    <tr><td>Perjanjian</td><td>${(d.riwayatPerjanjian?.[0]?.no_perjanjian_penghuni)||'-'}</td></tr>
+    <tr><td>Tanggal Berakhir</td><td>${fmtTanggal(d.riwayatPerjanjian?.[0]?.tgl_perjanjian_akhir_penghuni)}</td></tr>
+  </table>
+
+  <!-- IDENTITAS 1-18 -->
+  <table width="100%" border="1" cellspacing="0" cellpadding="5" style="margin-bottom:8px;">
+    <tr><td width="5%">1</td><td width="35%">Nama Penghuni</td><td>${d.nama||'-'}</td></tr>
+    <tr><td>2</td><td>NIK Penghuni</td><td>${d.nik||'-'}</td></tr>
+    <tr><td>3</td><td>Tempat Tanggal Lahir</td><td>${fmtTanggal(d.ttl)}</td></tr>
+    <tr><td>4</td><td>Agama</td><td>${d.agama||'-'}</td></tr>
+    <tr><td>5</td><td>Status Perkawinan</td><td>${d.statusPerkawinan||'-'}</td></tr>
+    <tr><td>6</td><td>Alamat</td><td>${d.alamat||'-'}</td></tr>
+    <tr><td>7</td><td>Status Tempat Tinggal</td><td>${d.statusTempatTinggal||'-'}</td></tr>
+    <tr><td>8</td><td>Pekerjaan</td><td>${d.pekerjaan||'-'}</td></tr>
+    <tr><td>9</td><td>Penghasilan</td><td>${d.penghasilan||'-'}</td></tr>
+    <tr><td>10</td><td>Pekerjaan Istri/Suami</td><td>${d.pekerjaanPasangan||'-'}</td></tr>
+    <tr><td>11</td><td>Penghasilan Istri/Suami</td><td>${d.penghasilanPasangan||'-'}</td></tr>
+    <tr><td>12</td><td>Total Penghasilan</td><td>${d.totalPenghasilan||'-'}</td></tr>
+    <tr><td>13</td><td>Nomor Telp./HP</td><td>${d.telp||'-'}</td></tr>
+    <tr><td>14</td><td>Email</td><td>${d.email||'-'}</td></tr>
+  </table>
+
+  <!-- ANGGOTA KELUARGA -->
+  <div style="font-weight:bold;margin:10px 0;">Data Penghuni</div>
+  <table width="100%" border="1" cellspacing="0" cellpadding="5">
+    <tr>
+      <th>Nama</th>
+      <th>NIK</th>
+      <th>Jenis Kelamin</th>
+      <th>Umur</th>
+      <th>Status</th>
+    </tr>
+    ${[1,2,3,4].map(i=>{
+      if(!d["anggota"+i]) return "";
+      return `
+        <tr>
+          <td>${d["anggota"+i]}</td>
+          <td>${d["nik"+i]||''}</td>
+          <td>${d["jk"+i]||''}</td>
+          <td>${d["umur"+i]||''}</td>
+          <td>${d["status"+i]||''}</td>
+        </tr>
+      `;
+    }).join("")}
+  </table>
+
+  <div style="page-break-before:always;"></div>
+
+  <!-- DATA PENJAMIN -->
+  <div style="font-weight:bold;margin-bottom:8px;">20. Data Penjamin</div>
+  <table width="100%" border="1" cellspacing="0" cellpadding="5">
+    <tr><td width="40%">Nama Penjamin</td><td>${d.penjamin||'-'}</td></tr>
+    <tr><td>NIK</td><td>${d.nikPenjamin||'-'}</td></tr>
+    <tr><td>Alamat</td><td>${d.alamatPenjamin||'-'}</td></tr>
+    <tr><td>Pekerjaan</td><td>${d.statusPenjamin||'-'}</td></tr>
+    <tr><td>Nomor Telp./HP</td><td>${d.telpPenjamin||'-'}</td></tr>
+  </table>
+
+  <div style="margin-top:20px;font-size:10px;">
+    Hal. 1/2 | Dicetak pada tanggal ${cetakTanggal}
+  </div>
+  `;
+
+  html2pdf().set({
+    margin:10,
+    filename:"DATA_PENGHUNI_"+d.unit+".pdf",
+    html2canvas:{scale:2},
+    jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
+  }).from(el).save();
 }
 
 function closeModal(){
