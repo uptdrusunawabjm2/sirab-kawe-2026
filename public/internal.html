@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <title>Dashboard Internal Rusun</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 .badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
@@ -128,8 +129,17 @@ if(sessionStorage.getItem("RUSUN_LOGIN")!=="OK"){
 <div class="bg-slate-900 max-w-6xl w-full rounded-2xl p-6 overflow-y-auto max-h-[90vh]">
 
 <div class="flex justify-between items-center mb-4">
-<h2 id="judulDetail" class="text-xl font-bold">Detail Penghuni</h2>
-<button onclick="closeModal()" class="text-red-400 font-bold">✖ Tutup</button>
+  <h2 id="judulDetail" class="text-xl font-bold">Detail Penghuni</h2>
+  <div class="flex gap-3">
+    <button onclick="exportPDF()" 
+      class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm">
+      Export PDF
+    </button>
+    <button onclick="closeModal()" 
+      class="text-red-400 font-bold">
+      ✖ Tutup
+    </button>
+  </div>
 </div>
 
 <div id="detailBox" class="space-y-6"></div>
@@ -193,20 +203,36 @@ function renderTable(){
   filteredData.slice(start,start+rowsPerPage).forEach(d=>{
     tbody.innerHTML+=`
     <tr class="border-b border-slate-800 hover:bg-slate-800">
-      <td class="py-1 uppercase text-blue-400 cursor-pointer font-bold" onclick='openDetail(${JSON.stringify(d)})'>${d.unit}</td>
+      <td class="py-1 uppercase text-blue-400 cursor-pointer font-bold data-unit"
+    data-unit="${d.unit}">
+    ${d.unit}
+</td>
       <td>${d.nama}</td>
       <td>${badgeStatus(d.kondisiunit)}</td>
       <td>Rp ${Number(d.pembayaran).toLocaleString("id-ID")}</td>
       <td>Rp ${Number(d.tunggakan).toLocaleString("id-ID")}</td>
     </tr>`;
   });
+
+document.querySelectorAll(".data-unit").forEach(el=>{
+  el.onclick = () => openDetailByUnit(el.dataset.unit);
+});
+
   renderPagination();
+}
+
+function openDetailByUnit(unit){
+  const data = allData.find(x => x.unit === unit);
+  if(!data){
+    alert("Data tidak ditemukan");
+    return;
+  }
+  openDetail(data);
 }
 
 function renderPagination(){
   pagination.innerHTML="";
   const totalPage=Math.ceil(filteredData.length/rowsPerPage);
-
   const prev=document.createElement("button");
   prev.textContent="Prev";
   prev.disabled=currentPage===1;
@@ -548,6 +574,20 @@ function openDetail(d){
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+}
+
+function exportPDF(){
+  const element = document.getElementById("detailBox");
+
+  const opt = {
+    margin: 10,
+    filename: judulDetail.innerText.replace(/\s+/g,"_") + ".pdf",
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
 }
 
 function closeModal(){
