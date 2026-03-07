@@ -206,7 +206,7 @@ modal=document.getElementById("modal"),
 detailBox=document.getElementById("detailBox"),
 judulDetail=document.getElementById("judulDetail");
 
-let allData=[],filteredData=[],currentPage=1,rowsPerPage=25;
+let allData=[],filteredData=[],currentPage=1,rowsPerPage=25,currentDetail=null;
 
 async function loadData(){
   const res=await fetch("/api/data?action=internal&key=rusun2026",{headers:{"X-Requested-With":"XMLHttpRequest"}});
@@ -605,6 +605,9 @@ return `
 /* =================================================================== */
 
 function openDetail(d){
+
+currentDetail = d;
+
 judulDetail.innerHTML =
 `Detail Penghuni - Unit ${String(d.unit).toUpperCase()}
 <span class="ml-3">${badgeStatus(d.kondisiunit)}</span>`;
@@ -751,9 +754,11 @@ section("IDENTITAS PENGHUNI",`
 
 function exportPDF(){
 
-  const unitText = judulDetail.innerText.replace("Detail Penghuni - Unit ","").trim();
-  const d = allData.find(x => x.unit.toLowerCase() === unitText.toLowerCase());
-  if(!d) return;
+const d = currentDetail;
+if(!d){
+alert("Data tidak ditemukan");
+return;
+}
 
   const cetakTanggal = new Date().toLocaleDateString("id-ID");
 
