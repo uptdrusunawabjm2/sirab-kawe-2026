@@ -495,47 +495,104 @@ Belum ada data PDAM / Sampah
 }
 
 function rupiah(v){
-return v ? "Rp "+Number(v).toLocaleString("id-ID") : "-";
+return "Rp " + Number(v||0).toLocaleString("id-ID");
 }
-
-const totalPdam = rupiah(o["total pdam"]);
-const totalSampah = rupiah(o["total sampah"]);
 
 return `
 
-<div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-6 text-sm">
+<div class="space-y-6">
 
 <div>
-<div class="font-semibold text-slate-300 mb-1">PDAM</div>
 
-<div class="text-slate-400">
-2024 ${rupiah(o["pdam jlh uang 2024"])}
-<span class="mx-2 text-slate-600">|</span>
-2025 ${rupiah(o["pdam jlh uang 2025"])}
-<span class="mx-2 text-slate-600">|</span>
-2026 ${rupiah(o["pdam jlh uang 2026"])}
-</div>
+<div class="text-slate-400 text-sm mb-2">PDAM</div>
 
-<div class="text-slate-200 mt-1">
-Total ${totalPdam}
+<div class="overflow-x-auto border border-slate-800 rounded-lg">
+<table class="min-w-full text-xs md:text-sm">
+
+<thead class="bg-slate-900 border-b border-slate-800">
+<tr class="text-slate-400">
+<th class="px-3 py-2 text-left">Tahun</th>
+<th class="px-3 py-2 text-left">Jumlah Bulan</th>
+<th class="px-3 py-2 text-right">Jumlah Uang</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr class="border-b border-slate-800">
+<td class="px-3 py-2">2024</td>
+<td class="px-3 py-2">${o["pdam jlh bln 2024"]||"-"}</td>
+<td class="px-3 py-2 text-right">${rupiah(o["pdam jlh uang 2024"])}</td>
+</tr>
+
+<tr class="border-b border-slate-800">
+<td class="px-3 py-2">2025</td>
+<td class="px-3 py-2">${o["pdam jlh bln 2025"]||"-"}</td>
+<td class="px-3 py-2 text-right">${rupiah(o["pdam jlh uang 2025"])}</td>
+</tr>
+
+<tr class="border-b border-slate-800">
+<td class="px-3 py-2">2026</td>
+<td class="px-3 py-2">${o["pdam jlh bln 2026"]||"-"}</td>
+<td class="px-3 py-2 text-right">${rupiah(o["pdam jlh uang 2026"])}</td>
+</tr>
+
+<tr class="bg-slate-900 font-semibold">
+<td class="px-3 py-2">TOTAL</td>
+<td></td>
+<td class="px-3 py-2 text-right">${rupiah(o["total pdam"])}</td>
+</tr>
+
+</tbody>
+</table>
 </div>
 
 </div>
 
 
 <div>
-<div class="font-semibold text-slate-300 mb-1">SAMPAH</div>
 
-<div class="text-slate-400">
-2024 ${rupiah(o["sampah jlh uang 2024"])}
-<span class="mx-2 text-slate-600">|</span>
-2025 ${rupiah(o["sampah jlh uang 2025"])}
-<span class="mx-2 text-slate-600">|</span>
-2026 ${rupiah(o["sampah jlh uang 2026"])}
-</div>
+<div class="text-slate-400 text-sm mb-2">SAMPAH</div>
 
-<div class="text-slate-200 mt-1">
-Total ${totalSampah}
+<div class="overflow-x-auto border border-slate-800 rounded-lg">
+<table class="min-w-full text-xs md:text-sm">
+
+<thead class="bg-slate-900 border-b border-slate-800">
+<tr class="text-slate-400">
+<th class="px-3 py-2 text-left">Tahun</th>
+<th class="px-3 py-2 text-left">Jumlah Bulan</th>
+<th class="px-3 py-2 text-right">Jumlah Uang</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr class="border-b border-slate-800">
+<td class="px-3 py-2">2024</td>
+<td class="px-3 py-2">${o["sampah jlh bln 2024"]||"-"}</td>
+<td class="px-3 py-2 text-right">${rupiah(o["sampah jlh uang 2024"])}</td>
+</tr>
+
+<tr class="border-b border-slate-800">
+<td class="px-3 py-2">2025</td>
+<td class="px-3 py-2">${o["sampah jlh bln 2025"]||"-"}</td>
+<td class="px-3 py-2 text-right">${rupiah(o["sampah jlh uang 2025"])}</td>
+</tr>
+
+<tr class="border-b border-slate-800">
+<td class="px-3 py-2">2026</td>
+<td class="px-3 py-2">${o["sampah jlh bln 2026"]||"-"}</td>
+<td class="px-3 py-2 text-right">${rupiah(o["sampah jlh uang 2026"])}</td>
+</tr>
+
+<tr class="bg-slate-900 font-semibold">
+<td class="px-3 py-2">TOTAL</td>
+<td></td>
+<td class="px-3 py-2 text-right">${rupiah(o["total sampah"])}</td>
+</tr>
+
+</tbody>
+</table>
 </div>
 
 </div>
