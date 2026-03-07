@@ -222,9 +222,9 @@ async function loadData(){
 function badgeStatus(status){
   if(!status) return "-";
   const s=status.toLowerCase();
-  if(s.includes("terisi")) return `<span class="badge badge-terisi">Terisi</span>`;
-  if(s.includes("rusak")) return `<span class="badge badge-rusak">Rusak</span>`;
-  if(s.includes("siap")) return `<span class="badge badge-siap">Siap Huni</span>`;
+  if(s.includes("terisi")) return `<span class="badge badge-terisi">TERISI</span>`;
+  if(s.includes("rusak")) return `<span class="badge badge-rusak">RUSAK</span>`;
+  if(s.includes("siap")) return `<span class="badge badge-siap">SIAP HUNI</span>`;
   return status;
 }
 
@@ -605,17 +605,9 @@ return `
 /* =================================================================== */
 
 function openDetail(d){
-  judulDetail.innerText="Detail Penghuni - Unit "+d.unit;
-
-
-detailBox.innerHTML=
-
-`
-<section class="bg-slate-800/60 p-4 rounded-xl text-center">
-<div class="text-slate-400 text-xs mb-2">STATUS UNIT</div>
-<div class="text-lg">${badgeStatus(d.kondisiunit)}</div>
-</section>
-`
+judulDetail.innerHTML =
+`Detail Penghuni - Unit ${String(d.unit).toUpperCase()}
+<span class="ml-3">${badgeStatus(d.kondisiunit).toUpperCase()}</span>`;
 
 +
 section("IDENTITAS PENGHUNI",`
