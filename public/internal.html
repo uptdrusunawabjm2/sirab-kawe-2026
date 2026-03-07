@@ -142,10 +142,18 @@ if(sessionStorage.getItem("RUSUN_LOGIN")!=="OK"){
 <div class="flex gap-3 mb-4">
   <input id="searchInput" placeholder="Cari unit / nama..." class="flex-1 p-2 bg-slate-800 rounded">
   <select id="statusFilter" class="p-2 bg-slate-800 rounded">
-    <option value="">Semua Status</option>
+      <option value="">Semua Status</option>
     <option value="TERISI">Terisi</option>
     <option value="RUSAK">Rusak</option>
     <option value="SIAP">Siap Huni</option>
+  </select>
+
+  <select id="tunggakanFilter" class="p-2 bg-slate-800 rounded">
+      <option value="">Semua Keuangan</option>
+      <option value="SEWA">Tunggakan Sewa</option>
+      <option value="PDAM">Tunggakan PDAM</option>
+      <option value="SAMPAH">Tunggakan Sampah</option>
+      <option value="ADA">Ada Tunggakan Apapun</option>
   </select>
 </div>
 
@@ -201,6 +209,7 @@ totalTunggakan=document.getElementById("totalTunggakan"),
 tbody=document.getElementById("tbody"),
 searchInput=document.getElementById("searchInput"),
 statusFilter=document.getElementById("statusFilter"),
+tunggakanFilter=document.getElementById("tunggakanFilter"),
 pagination=document.getElementById("pagination"),
 modal=document.getElementById("modal"),
 detailBox=document.getElementById("detailBox"),
@@ -229,15 +238,39 @@ function badgeStatus(status){
 }
 
 function applyFilter(){
-  const search=searchInput.value.toLowerCase(),status=statusFilter.value;
-  filteredData=allData.filter(d=>{
-    const unit=(d.unit||"").toLowerCase(),
-          nama=(d.nama||"").toLowerCase(),
-          st=(d.kondisiunit||"").toUpperCase();
-    return (unit.includes(search)||nama.includes(search)) && (!status||st.includes(status));
-  });
-  currentPage=1;
-  renderTable();
+
+const search = searchInput.value.toLowerCase();
+const status = statusFilter.value;
+const tunggakan = tunggakanFilter.value;
+
+filteredData = allData.filter(d=>{
+
+const unit=(d.unit||"").toLowerCase();
+const nama=(d.nama||"").toLowerCase();
+const st=(d.kondisiunit||"").toUpperCase();
+
+let cocokSearch = unit.includes(search) || nama.includes(search);
+let cocokStatus = !status || st.includes(status);
+
+let sewa = Number(d.tunggakan||0) > 0;
+
+let pdam = d.pdamSampah && Number(d.pdamSampah["total pdam"]||0) > 0;
+
+let sampah = d.pdamSampah && Number(d.pdamSampah["total sampah"]||0) > 0;
+
+let cocokTunggakan = true;
+
+if(tunggakan==="SEWA") cocokTunggakan = sewa;
+if(tunggakan==="PDAM") cocokTunggakan = pdam;
+if(tunggakan==="SAMPAH") cocokTunggakan = sampah;
+if(tunggakan==="ADA") cocokTunggakan = sewa || pdam || sampah;
+
+return cocokSearch && cocokStatus && cocokTunggakan;
+
+});
+
+currentPage=1;
+renderTable();
 }
 
 function renderTable(){
@@ -897,6 +930,7 @@ function closeModal(){
 
 searchInput.addEventListener("input",applyFilter);
 statusFilter.addEventListener("change",applyFilter);
+tunggakanFilter.addEventListener("change",applyFilter);
 
 loadData();
 </script>
